@@ -4,7 +4,7 @@ export const active = async (code?: string) => {
   let license = await RTNWebMap?.getLicenseInfo()
   if (!license) {
     // 激活序列号，替换为有效的序列号
-    const serial = code || 'TAF78-X52C8-CPDTY-4QHMV-VFX8W'
+    const serial = code || 'MF56B-TT2GT-DG72U-5CYSY-R2THD'
     const result = await RTNWebMap?.activate(serial)
     if (result) {
       license = await RTNWebMap?.getLicenseInfo()

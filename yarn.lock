@@ -1732,10 +1732,10 @@
     tar "^6.1.15"
     tmp "^0.2.1"
 
-"@react-native-oh/react-native-harmony@^0.72.70":
-  version "0.72.70"
-  resolved "https://mirrors.huaweicloud.com/repository/npm/@react-native-oh/react-native-harmony/-/react-native-harmony-0.72.70.tgz"
-  integrity sha512-J5YIfqMLyu/7CJ5IUxBggZR4t4QURdafHW20cjxWb90k8ldk3UqhK9P2aQtohQSqm3vk55gb3EN8KJqEoEzobw==
+"@react-native-oh/react-native-harmony@0.72.67":
+  version "0.72.67"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/@react-native-oh/react-native-harmony/-/react-native-harmony-0.72.67.tgz"
+  integrity sha512-O1Pf6pxJAjK33hZGQc7dA+NVt4bj2xmew2y8zFUEqfh0j90nOdZ9ihuDLE2lF8cB0uSh7IWPDgXmYD5Aq2C/jA==
   dependencies:
     "@react-native-oh/react-native-harmony-cli" "^0.0.28"
     colors "^1.4.0"

@@ -6,7 +6,7 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "@rnoh/react-native-openharmony": "^0.72.70",
+    "@rnoh/react-native-openharmony": "0.72.67",
     "@react-native-oh-tpl/react-native-webview": "file:../../node_modules/@react-native-oh-tpl/react-native-webview/harmony/rn_webview.har",
     "@mapplus/react-native-webmap": "file:../../node_modules/@mapplus/react-native-webmap/harmony/rn_webmap.har",
     "@react-native-oh-tpl/react-native-safe-area-context": "file:../../node_modules/@react-native-oh-tpl/react-native-safe-area-context/harmony/safe_area.har",
