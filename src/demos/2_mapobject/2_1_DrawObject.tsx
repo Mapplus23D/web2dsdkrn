@@ -1,5 +1,7 @@
 /**
  * 几何图形绘制Demo
+ * 
+ * 准星和手绘打点，绘制点、线、面对象
  */
 import { AddLayerParam, IFillStyle, ILicenseInfo, ILineStyle, IPointStyle, RTNWebMap } from '@mapplus/react-native-webmap';
 import { useEffect, useRef, useState } from 'react';

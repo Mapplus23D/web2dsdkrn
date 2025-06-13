@@ -1,3 +1,8 @@
+/**
+ * 底图demo
+ * 
+ * 实现矢量底图和影响底图的添加和切换
+ */
 import { ILicenseInfo, RTNWebMap } from '@mapplus/react-native-webmap';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, SectionList, SectionListData, SectionListRenderItemInfo, Text, TouchableOpacity, View } from 'react-native';
