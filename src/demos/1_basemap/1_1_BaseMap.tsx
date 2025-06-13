@@ -58,11 +58,11 @@ export default function BaseMap(props: Props) {
       if (res) {
         setClientUrl(res)
       }
-      // initData()
     }
     return () => {
-      // Web3dUtils.getClient()?.scene.close()
-      // Web3dUtils.setClient(null)
+      // 退出页面，关闭地图
+      WebMapUtil.getClient()?.mapControl.closeMap()
+      WebMapUtil.setClient(null)
     }
   }, [license])
 
@@ -144,7 +144,6 @@ export default function BaseMap(props: Props) {
   }
 
   const _renderItem = ({ section, index }: SectionListRenderItemInfo<BaseLayerItem, Section>) => {
-    console.log(section.data[index].title)
     return (
       <TouchableOpacity
         key={index}

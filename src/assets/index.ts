@@ -21,6 +21,11 @@ const bg_base_tx_layer = require('./baseLayer/bg_base_tx_layer.png')
 const bg_base_tx_light_layer = require('./baseLayer/bg_base_tx_light_layer.png')
 const bg_base_tx_terrain_layer = require('./baseLayer/bg_base_tx_terrain_layer.png')
 
+const icon_aim_point = require('./icon_aim_point.png')
+const icon_label = require('./icon_label.png')
+const icon_line_black = require('./icon_line_black.png')
+const icon_point_black = require('./icon_point_black.png')
+const icon_region_black = require('./icon_region_black.png')
 
 const images = {
   icon_back,
@@ -45,6 +50,12 @@ const images = {
   bg_base_tianditu_image_layer,
   bg_base_tianditu_layer,
   bg_base_tianditu_terrain_layer,
+
+  icon_aim_point,
+  icon_label,
+  icon_line_black,
+  icon_point_black,
+  icon_region_black,
 }
 
 function getAssets(theme?: string) {

@@ -35,10 +35,10 @@ const DemoList = ({ navigation }: Props) => {
       {
         title: '底图覆盖物',
         data: [
-          // {
-          //   title: '几何图形',
-          //   path: 'DrawObject',
-          // },
+          {
+            title: '几何图形',
+            path: 'DrawObject',
+          },
           // {
           //   title: '文本绘制',
           //   path: 'DrawText',
