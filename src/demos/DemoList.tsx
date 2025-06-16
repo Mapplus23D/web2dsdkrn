@@ -39,10 +39,10 @@ const DemoList = ({ navigation }: Props) => {
             title: '几何图形',
             path: 'DrawObject',
           },
-          // {
-          //   title: '文本绘制',
-          //   path: 'DrawText',
-          // },
+          {
+            title: '文本绘制',
+            path: 'DrawText',
+          },
           // {
           //   title: '数据导入',
           //   path: 'DataImport',

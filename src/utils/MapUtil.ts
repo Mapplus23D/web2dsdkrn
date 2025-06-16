@@ -1,13 +1,15 @@
-import { AddLayerParam, IGeoJSONDatasource } from '@mapplus/react-native-webmap'
+import { AddLayerParam, IGeoJSONDatasource, IGeometryType } from '@mapplus/react-native-webmap'
 import { WebMapUtil } from '.'
 
 /**
- * 添加数据源
+ * 导入数据源
  * @param datasourceDatas 
  * @returns 
  */
-export const addDatasource = async (datasourceDatas: {
+export const importDatasource = async (datasourceDatas: {
+  /** 导入数据源json字符串 */
   content: string,
+  /** 数据源名称 */
   name: string
 }[]) => {
   const webmap = WebMapUtil.getClient()
@@ -65,7 +67,14 @@ export const addDatasource = async (datasourceDatas: {
  * @param data 图层数据集
  * @returns 
  */
-export const addLayer = async (data: IGeoJSONDatasource) => {
+export const addLayer = async (data: {
+  /** 图层类型 */
+  geometryType: IGeometryType
+  /** 数据源id */
+  dsId: string
+  /** 图层名称 */
+  name: string
+}) => {
   const webmap = WebMapUtil.getClient()
   if (!webmap) return
   let params: AddLayerParam | undefined = undefined
@@ -87,9 +96,9 @@ export const addLayer = async (data: IGeoJSONDatasource) => {
       }
       params = {
         type: 'vector',
-        sourceId: data.id,
+        sourceId: data.dsId,
         name: data.name,
-        geometryType: 'point',
+        geometryType: data.geometryType,
         style: style,
       }
       metadata.layerType = params.type
@@ -103,9 +112,9 @@ export const addLayer = async (data: IGeoJSONDatasource) => {
       }
       params = {
         type: 'vector',
-        sourceId: data.id,
+        sourceId: data.dsId,
         name: data.name,
-        geometryType: 'line',
+        geometryType: data.geometryType,
         style: style,
       }
       metadata.layerType = params.type
@@ -121,9 +130,9 @@ export const addLayer = async (data: IGeoJSONDatasource) => {
       }
       params = {
         type: 'vector',
-        sourceId: data.id,
+        sourceId: data.dsId,
         name: data.name,
-        geometryType: 'fill',
+        geometryType: data.geometryType,
         style: style,
       }
       metadata.layerType = params.type
@@ -132,8 +141,8 @@ export const addLayer = async (data: IGeoJSONDatasource) => {
     case 'text':
       // 文本图层
       params = {
-        type: 'text',
-        sourceId: data.id,
+        type: data.geometryType,
+        sourceId: data.dsId,
         name: data.name,
       }
       metadata.layerType = params.type

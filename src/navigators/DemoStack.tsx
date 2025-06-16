@@ -1,6 +1,7 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import BaseMap from '../demos/1_basemap/1_1_BaseMap';
 import DrawObject from '../demos/2_mapobject/2_1_DrawObject';
+import DrawText from '../demos/2_mapobject/2_2_DrawText';
 import DemoList from '../demos/DemoList';
 import Home from '../pages/Home';
 import { DemoStackParamList } from './types';
@@ -17,6 +18,7 @@ export default function DemoStack() {
       <Stack.Screen name="DemoList" component={DemoList} />
       <Stack.Screen name="BaseMap" component={BaseMap} />
       <Stack.Screen name="DrawObject" component={DrawObject} />
+      <Stack.Screen name="DrawText" component={DrawText} />
     </Stack.Navigator>
   );
 }
