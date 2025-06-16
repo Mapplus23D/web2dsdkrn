@@ -1,8 +1,3 @@
-/**
- * 几何图形绘制Demo
- * 
- * 准星和手绘打点，绘制点、线、面对象
- */
 import { AddLayerParam, IFillStyle, ILicenseInfo, ILineStyle, IPointStyle, RTNWebMap } from '@mapplus/react-native-webmap';
 import { useEffect, useRef, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
@@ -24,7 +19,11 @@ enum DrawType {
   /** 面 */
   Region,
 }
-
+/**
+ * 几何图形绘制Demo
+ * 
+ * 准星和手绘打点，绘制点、线、面对象
+ */
 export default function DrawObject(props: Props) {
 
   const pointLayerID = useRef<string>()
@@ -94,15 +93,12 @@ export default function DrawObject(props: Props) {
         await client.layers.setEditable(currentLayerID.current, true)
         await client.mapControl.setAction(client.Action.draw_point)
         break
-      case DrawType.Line: {
+      case DrawType.Line:
         if (!lineLayerID.current) return
         currentLayerID.current = lineLayerID.current
-        let result = await client.layers.setEditable(currentLayerID.current, true)
-        console.log(result)
-        result = await client.mapControl.setAction(client.Action.draw_line)
-        console.log(result)
+        await client.layers.setEditable(currentLayerID.current, true)
+        await client.mapControl.setAction(client.Action.draw_line)
         break
-      }
       case DrawType.Region:
         if (!regionLayerID.current) return
         currentLayerID.current = regionLayerID.current
@@ -115,7 +111,7 @@ export default function DrawObject(props: Props) {
   /**
    * 初始化方法
    *
-   * 当sdk初始化完成，我们通过这里的初始化方法开始进行场景参数设置及地图初始化工作
+   * 当sdk初始化完成，我们通过这里的初始化方法开始进行地图图层初始化工作
    */
   const init = async () => {
     const client = WebMapUtil.getClient()
@@ -127,7 +123,7 @@ export default function DrawObject(props: Props) {
   }
 
   /**
-   * 相机飞行（地图定位）到指定点位
+   * 地图定位到当前位置
    */
   const flyToInitPosition = async () => {
     const client = WebMapUtil.getClient();
@@ -293,7 +289,7 @@ export default function DrawObject(props: Props) {
     const client = WebMapUtil.getClient()
     if (!client) return;
 
-    const dss = await BaseLayerData.vector[0].action()
+    const dss = await BaseLayerData.image[0].action()
     for (const ds of dss) {
       ds && await client.baseLayers.add({
         sourceId: ds.id,
@@ -394,7 +390,6 @@ export default function DrawObject(props: Props) {
     const client = WebMapUtil.getClient()
     if (!client || drawType === DrawType.Null) return
     const llPoint = await getDrawPosition(false)
-    console.log(llPoint)
     client.mapControl.addTouchPoint(llPoint)
   }
 
