@@ -37,9 +37,6 @@ export default function DrawObject(props: Props) {
 
   /** 准星图标句柄 用于获取屏幕坐标 */
   const aimPointImageRef = useRef<Image>(null)
-  const editTimer = useRef<number | null>(null)
-  const editPoints = useRef<any[]>([])
-  const history = useRef<{ layer: string, id: string }[]>([])
 
   const [clientUrl, setClientUrl] = useState<string | undefined>()
 

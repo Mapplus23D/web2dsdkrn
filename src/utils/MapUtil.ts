@@ -1,5 +1,6 @@
-import { AddLayerParam, IGeoJSONDatasource, IGeometryType } from '@mapplus/react-native-webmap'
+import { AddLayerParam, ExcelData, IGeoJSONDatasource, IGeometryType } from '@mapplus/react-native-webmap'
 import { WebMapUtil } from '.'
+import NativeHTools from '../specs/v1/NativeHTools'
 
 /**
  * 导入数据源
@@ -61,6 +62,111 @@ export const importDatasource = async (datasourceDatas: {
   }
   return datasources
 }
+
+/**
+ * 导入 GeoJSON 数据到指定图层
+ * @param filePath 
+ * @param dsName 
+ * @returns 
+ */
+export const importGeojson = async (filePath: string, dsName: string) => {
+  const webmap = WebMapUtil.getClient()
+  if (!webmap) return false
+
+  const content = await NativeHTools?.readFile(filePath)
+  if (!content) return false
+  const geojson = JSON.parse(content)
+  const result = await webmap.dataConverter.GeoJSONtoData(geojson)
+
+  for (const item of result) {
+    const ds = await webmap.datasources.add({
+      type: 'geojson',
+      name: dsName,
+      data: {
+        type: item.data.type || 'FeatureCollection',
+        features: item.data.features,
+      },
+      fieldInfos: item.fieldInfos,
+      geometryType: item.type,
+    })
+    if (ds) {
+      await addLayer({
+        geometryType: item.type,
+        dsId: ds,
+        name: dsName,
+      })
+    }
+  }
+  return true
+}
+
+/**
+ * 读取Excel文件
+ * @param filePath 
+ * @returns 
+ */
+export const readExcel = async (filePath: string) => {
+  const webmap = WebMapUtil.getClient()
+  if (!webmap) return undefined
+  const content = await NativeHTools?.readFile(filePath, 'base64')
+
+  if (!content) return undefined
+
+  const result = await webmap.dataConverter.readExcel(content, {
+    firstLineAsFieldInfo: true,
+  })
+  return result
+}
+
+/**
+ * 导入 Excel 数据到指定图层
+ * @param params 
+ * @returns 
+ */
+export const importExcel = async (params: {
+  dsName: string,
+  data: ExcelData,
+  xName: string,
+  yName: string
+}) => {
+  const webmap = WebMapUtil.getClient()
+  if (!webmap) return undefined
+
+  if (!params.xName || !params.yName) return undefined
+
+  const reulst2 = await webmap.dataConverter.excelToData(params.data, {
+    /** 导入类型，目前只有按坐标导入 */
+    type: "coordinate",
+    /** x 坐标所在列的字段名 */
+    x: params.xName,
+    /** y 坐标所在列的字段名 */
+    y: params.yName,
+  })
+  if (!reulst2.success) return undefined
+  try {
+    const ds = await webmap.datasources.add({
+      type: 'geojson',
+      name: params.dsName,
+      data: {
+        type: 'FeatureCollection',
+        features: reulst2.data.data.features,
+      },
+      fieldInfos: reulst2.data.fieldInfos,
+      geometryType: reulst2.data.type,
+    })
+    if (ds) {
+      return await addLayer({
+        geometryType: reulst2.data.type,
+        dsId: ds,
+        name: params.dsName,
+      })
+    }
+    return undefined
+  } catch (error) {
+    return undefined
+  }
+}
+
 
 /**
  * 新建图层

@@ -12,6 +12,22 @@
     "test": "jest",
     "prepare": "husky"
   },
+  "harmony": {
+    "codegenConfig": [
+      {
+        "version": 1,
+        "specPaths": [
+          "./src/specs/v1"
+        ]
+      },
+      {
+        "version": 2,
+        "specPaths": [
+          "./src/specs/v2"
+        ]
+      }
+    ]
+  },
   "dependencies": {
     "@mapplus/react-native-webmap": "file:../react-native-webmap/dist/react-native-webmap.tgz",
     "@react-native-oh-tpl/react-native-safe-area-context": "^4.7.4-0.2.1",
