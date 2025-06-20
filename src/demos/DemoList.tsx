@@ -47,6 +47,10 @@ const DemoList = ({ navigation }: Props) => {
             title: '数据导入',
             path: 'DataImport',
           },
+          {
+            title: '专题图',
+            path: 'ThemeLayer',
+          },
           // {
           //   title: '图层风格',
           //   path: 'LayerStyle',

@@ -17,6 +17,7 @@ export type DemoStackParamList = {
   ObjectEdit: undefined;
   ObjectAttribute: undefined;
   MapOpenSave: undefined;
+  ThemeLayer: undefined;
 };
 
 export type DemoStackNavigationProps<

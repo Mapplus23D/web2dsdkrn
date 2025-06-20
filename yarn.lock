@@ -1480,7 +1480,7 @@
 "@mapplus/react-native-webmap@file:../react-native-webmap/dist/react-native-webmap.tgz":
   version "0.0.1"
   resolved "file:../react-native-webmap/dist/react-native-webmap.tgz"
-  integrity sha512-FHks9V+TXbHxuQXsrKUP1q4E2jWpho5sSSUiQaGtO8/igjhhYlrC1lXmULA+M8alv0QYiru97h9OAdchqJBIzA==
+  integrity sha512-U9MInQixQDr3mmVN29tiiSU5aCBtL3ByZuXM4S7jBRaq/avNsuFKarFacLgIYR3INXTGVyDo1XCFctb1jT6Eww==
 
 "@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1":
   version "5.1.1-v1"
@@ -1814,6 +1814,11 @@
     metro-config "^0.76.9"
     metro-react-native-babel-transformer "^0.76.9"
     metro-runtime "^0.76.9"
+
+"@react-native/normalize-color@*":
+  version "2.1.0"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/@react-native/normalize-color/-/normalize-color-2.1.0.tgz"
+  integrity sha512-Z1jQI2NpdFJCVgpY+8Dq/Bt3d+YUi1928Q+/CZm/oh66fzM0RUl54vvuXlPJKybH4pdCZey1eDTPaLHkMPNgWA==
 
 "@react-native/normalize-colors@*":
   version "0.79.3"
@@ -3045,6 +3050,15 @@ depd@2.0.0:
   version "2.0.0"
   resolved "https://mirrors.huaweicloud.com/repository/npm/depd/-/depd-2.0.0.tgz"
   integrity sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==
+
+deprecated-react-native-prop-types@^2.3.0:
+  version "2.3.0"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/deprecated-react-native-prop-types/-/deprecated-react-native-prop-types-2.3.0.tgz"
+  integrity sha512-pWD0voFtNYxrVqvBMYf5gq3NA2GCpfodS1yNynTPc93AYA/KEMGeWDqqeUB6R2Z9ZofVhks2aeJXiuQqKNpesA==
+  dependencies:
+    "@react-native/normalize-color" "*"
+    invariant "*"
+    prop-types "*"
 
 deprecated-react-native-prop-types@4.1.0:
   version "4.1.0"
@@ -6208,7 +6222,7 @@ prompts@^2.0.1, prompts@^2.4.0:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@*, prop-types@^15.8.1:
+prop-types@*, prop-types@^15.6.0, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://mirrors.huaweicloud.com/repository/npm/prop-types/-/prop-types-15.8.1.tgz"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -6292,6 +6306,14 @@ react-is@^17.0.1:
   resolved "https://mirrors.huaweicloud.com/repository/npm/react-is/-/react-is-17.0.2.tgz"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
+react-native-easy-toast@^2.3.0:
+  version "2.3.0"
+  resolved "https://mirrors.huaweicloud.com/repository/npm/react-native-easy-toast/-/react-native-easy-toast-2.3.0.tgz"
+  integrity sha512-+tn+6HyxudUtm+KPMidtHnheewDMS7i12HIKiRptk4M7R10jCvR4Tb6cVL8dYDA5ldWS97/kweSlLimPAb3Zyg==
+  dependencies:
+    deprecated-react-native-prop-types "^2.3.0"
+    prop-types "^15.6.0"
+
 "react-native-gesture-handler@>= 1.0.0":
   version "2.25.0"
   resolved "https://mirrors.huaweicloud.com/repository/npm/react-native-gesture-handler/-/react-native-gesture-handler-2.25.0.tgz"
@@ -6341,7 +6363,7 @@ react-native-webview@13.10.2:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"
 
-react-native@*, react-native@0.72.5:
+react-native@*, react-native@>=0.20.0, react-native@0.72.5:
   version "0.72.5"
   resolved "https://mirrors.huaweicloud.com/repository/npm/react-native/-/react-native-0.72.5.tgz"
   integrity sha512-oIewslu5DBwOmo7x5rdzZlZXCqDIna0R4dUwVpfmVteORYLr4yaZo5wQnMeR+H7x54GaMhmgeqp0ZpULtulJFg==

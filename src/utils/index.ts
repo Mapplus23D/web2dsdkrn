@@ -1,10 +1,12 @@
 import * as LicenseUtil from './LicenseUtil'
-import * as WebMapUtil from './WebMapUtil'
 import * as MapUtil from './MapUtil'
+import ToolRefs from './ToolRefs'
+import * as WebMapUtil from './WebMapUtil'
 
 export {
   LicenseUtil,
-  WebMapUtil,
   MapUtil,
+  ToolRefs,
+  WebMapUtil
 }
 
