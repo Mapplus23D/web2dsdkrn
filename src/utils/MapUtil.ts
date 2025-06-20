@@ -1,4 +1,4 @@
-import { AddLayerParam, ExcelData, IGeoJSONDatasource, IGeometryType } from '@mapplus/react-native-webmap'
+import { AddLayerParam, ExcelData, IGeoJSONData, IGeoJSONDatasource, IGeometryType } from '@mapplus/react-native-webmap'
 import { WebMapUtil } from '.'
 import NativeHTools from '../specs/v1/NativeHTools'
 
@@ -65,19 +65,20 @@ export const importDatasource = async (datasourceDatas: {
 
 /**
  * 导入 GeoJSON 数据到指定图层
- * @param filePath 
- * @param dsName 
+ * @param constent GeoJSON 数据内容 
+ * @param dsName   数据源名称
  * @returns 
  */
-export const importGeojson = async (filePath: string, dsName: string) => {
+export const importGeojson = async (content: IGeoJSONData, dsName: string) => {
   const webmap = WebMapUtil.getClient()
-  if (!webmap) return false
+  if (!webmap || !content) return undefined
+  const result = await webmap.dataConverter.GeoJSONtoData(content)
 
-  const content = await NativeHTools?.readFile(filePath)
-  if (!content) return false
-  const geojson = JSON.parse(content)
-  const result = await webmap.dataConverter.GeoJSONtoData(geojson)
-
+  const importResult: {
+    datasourceID: string,
+    geometryType: IGeometryType,
+    layerName: string,
+  }[] = []
   for (const item of result) {
     const ds = await webmap.datasources.add({
       type: 'geojson',
@@ -90,14 +91,19 @@ export const importGeojson = async (filePath: string, dsName: string) => {
       geometryType: item.type,
     })
     if (ds) {
-      await addLayer({
+      const layerName = await addLayer({
         geometryType: item.type,
         dsId: ds,
         name: dsName,
       })
+      layerName && ds && importResult.push({
+        datasourceID: ds,
+        geometryType: item.type,
+        layerName: layerName,
+      })
     }
   }
-  return true
+  return importResult.length > 0 ? importResult : undefined
 }
 
 /**
@@ -257,6 +263,7 @@ export const addLayer = async (data: {
   if (params) {
     // 新建图层
     const layerId = await webmap.layers.add(params)
+    webmap.mapControl.refresh()
     return layerId
   } else {
     return undefined

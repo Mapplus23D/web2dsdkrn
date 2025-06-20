@@ -1,9 +1,10 @@
 import { Client, createRNClient } from "@mapplus/react-native-webmap"
 import React, { useMemo, useRef } from "react"
-import { Image, TouchableOpacity, View } from "react-native"
+import { View } from "react-native"
 import WebView from "react-native-webview"
 import { DemoStackNavigationProps, DemoStackParamList } from 'src/navigators/types'
 import { getAssets } from '../assets'
+import ImageButton from './ImageButton'
 
 interface Props {
   clientUrl: string
@@ -25,18 +26,16 @@ export default function WebmapView(props: Props) {
     return client
   }, [])
 
-  // useEffect(() => {
-  //   return () => {
-  //     client.mapControl?.close()
-  //   }
-  // }, [])
-
   const renderBackBtn = () => {
     if (!props.navigation) {
       return null
     }
     return (
-      <TouchableOpacity
+      <ImageButton
+        image={getAssets().icon_back}
+        onPress={() => {
+          props.navigation?.goBack()
+        }}
         style={{
           position: 'absolute',
           display: 'flex',
@@ -48,22 +47,8 @@ export default function WebmapView(props: Props) {
           height: 40,
           zIndex: 100,
           borderRadius: 4,
-          backgroundColor: 'rgba(0,0,0,0.3)',
         }}
-        onPress={() => {
-          props.navigation?.goBack()
-        }}
-      >
-        <Image
-          source={getAssets().icon_back}
-          style={[
-            {
-              height: 30,
-              width: 30,
-            },
-          ]}
-        />
-      </TouchableOpacity>
+      />
     )
   }
 
@@ -87,6 +72,7 @@ export default function WebmapView(props: Props) {
             props.onInited(client)
           })
         }}
+        webviewDebuggingEnabled={true}
         // 本地的web服务地址，包含实际的 sdk 代码引用
         source={{ uri: props.clientUrl }}
       />

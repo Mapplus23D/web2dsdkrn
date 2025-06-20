@@ -2,6 +2,7 @@ import { AddLayerParam, IFillStyle, ILicenseInfo, ILineStyle, IPointStyle, RTNWe
 import { useEffect, useRef, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getAssets } from '../../assets';
+import { ImageButton } from '../../components';
 import WebmapView from '../../components/WebmapView';
 import BaseLayerData from '../../constants/BaseLayerData';
 import { DemoStackPageProps } from '../../navigators/types';
@@ -397,7 +398,7 @@ export default function DrawObject(props: Props) {
       <View
         style={{
           position: 'absolute',
-          top: 60,
+          top: 80,
           bottom: 0,
           left: 0,
           right: 0,
@@ -411,27 +412,21 @@ export default function DrawObject(props: Props) {
             width: '30%',
             marginLeft: 10,
           }}>
-          <TouchableOpacity
-            style={[styles.methodBtn, { backgroundColor: drawType === DrawType.Point ? '#4680DF' : '#fff' }]}
-            activeOpacity={0.8}
+          <ImageButton
+            style={{ backgroundColor: drawType === DrawType.Point ? '#4680DF' : '#fff' }}
+            image={getAssets().icon_point_black}
             onPress={() => setAction(drawType === DrawType.Point ? DrawType.Null : DrawType.Point)}
-          >
-            <Image source={getAssets().icon_point_black} style={styles.methodBtnImg} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.methodBtn, { backgroundColor: drawType === DrawType.Line ? '#4680DF' : '#fff' }]}
-            activeOpacity={0.8}
-            onPress={() => setAction(drawType === DrawType.Line ? DrawType.Null : DrawType.Line)}
-          >
-            <Image source={getAssets().icon_line_black} style={[styles.methodBtnImg, { width: 24, height: 24 }]} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.methodBtn, { backgroundColor: drawType === DrawType.Region ? '#4680DF' : '#fff' }]}
-            activeOpacity={0.8}
-            onPress={() => setAction(drawType === DrawType.Region ? DrawType.Null : DrawType.Region)}
-          >
-            <Image source={getAssets().icon_region_black} style={styles.methodBtnImg} />
-          </TouchableOpacity>
+          />
+          <ImageButton
+            style={{ backgroundColor: drawType === DrawType.Line ? '#4680DF' : '#fff' }}
+            image={getAssets().icon_line_black}
+            onPress={() => setAction(drawType === DrawType.Point ? DrawType.Null : DrawType.Point)}
+          />
+          <ImageButton
+            style={{ backgroundColor: drawType === DrawType.Region ? '#4680DF' : '#fff' }}
+            image={getAssets().icon_region_black}
+            onPress={() => setAction(drawType === DrawType.Point ? DrawType.Null : DrawType.Point)}
+          />
         </View>
       </View>
     )

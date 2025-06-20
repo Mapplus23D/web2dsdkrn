@@ -1,12 +1,13 @@
 import { Client, ExcelData, IFieldInfo, ILicenseInfo, RTNWebMap } from '@mapplus/react-native-webmap'
 import { useEffect, useState } from 'react'
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { getAssets } from '../../assets'
+import { ImageButton } from '../../components'
 import WebmapView from '../../components/WebmapView'
 import BaseLayerData from '../../constants/BaseLayerData'
 import { DemoStackPageProps } from '../../navigators/types'
 import NativeHTools from '../../specs/v1/NativeHTools'
-import { LicenseUtil, MapUtil, WebMapUtil } from '../../utils'
+import { LicenseUtil, MapUtil, ToolRefs, WebMapUtil } from '../../utils'
 
 interface Props extends DemoStackPageProps<'DataImport'> { }
 
@@ -90,10 +91,20 @@ export default function DataImport(props: Props) {
     }).then(async (files) => {
       const client = WebMapUtil.getClient()
       if (!client || files.length <= 0) return
+      ToolRefs.getLoading()?.setLoading(true, {
+        info: '正在导入数据...',
+      })
 
-      for (const file of files) {
-        const dsName = file.substring(file.lastIndexOf('/') + 1, file.lastIndexOf('.'))
-        await MapUtil.importGeojson(file, dsName)
+      try {
+        for (const file of files) {
+          const dsName = file.substring(file.lastIndexOf('/') + 1, file.lastIndexOf('.'))
+          const content = await NativeHTools?.readFile(file)
+          const geojson = content ? JSON.parse(content) : undefined
+          geojson && await MapUtil.importGeojson(geojson, dsName)
+        }
+        ToolRefs.getLoading()?.setLoading(false)
+      } catch (error) {
+        ToolRefs.getLoading()?.setLoading(false)
       }
     })
   }
@@ -109,14 +120,68 @@ export default function DataImport(props: Props) {
     }).then(async (files) => {
       const client = WebMapUtil.getClient()
       if (!client || files.length <= 0) return
-      console.log(files)
-      const result = await MapUtil.readExcel(files[0])
-      console.log('读取到的字段信息：', result?.fieldInfos)
-      setExcelData(result)
-      if (result?.fieldInfos) {
-        const dsName = files[0].substring(files[0].lastIndexOf('/') + 1, files[0].lastIndexOf('.'))
-        setFileName(dsName)
-        setFieldInfos(result.fieldInfos)
+      ToolRefs.getLoading()?.setLoading(true, {
+        info: '正在导入数据...',
+      })
+      try {
+        const result = await MapUtil.readExcel(files[0])
+        setExcelData(result)
+        if (result?.fieldInfos) {
+          const dsName = files[0].substring(files[0].lastIndexOf('/') + 1, files[0].lastIndexOf('.'))
+          setFileName(dsName)
+          setFieldInfos(result.fieldInfos)
+        }
+        ToolRefs.getLoading()?.setLoading(false)
+      } catch (error) {
+        ToolRefs.getLoading()?.setLoading(false)
+      }
+    })
+  }
+  /**
+   * 打开文件管理器，选择 shp 文件
+   */
+  const openDictShp = async () => {
+    NativeHTools?.openDoc({
+      fileSuffixFilters: ['文档|shp,dbf,prj,shx'],
+      // 默认文件路径
+      defaultFilePathUri: 'file://docs/storage/Users/currentUser/test',
+    }).then(async (files) => {
+      const client = WebMapUtil.getClient()
+      if (!client || files.length <= 0) return
+      ToolRefs.getLoading()?.setLoading(true, {
+        info: '正在导入数据...',
+      })
+      const contents: {
+        type: "base64";
+        fileName: string;
+        base64: string;
+      }[] = []
+      let dsName = ''
+      // 读取shp相关文件的base64内容，放到数组中
+      for (const file of files) {
+        const fileName = file.substring(file.lastIndexOf('/') + 1)
+        const content = await NativeHTools?.readFile(file, 'base64')
+
+        if (!dsName) {
+          dsName = fileName.substring(0, fileName.lastIndexOf('.'))
+        }
+
+        content && contents.push({
+          type: "base64",
+          fileName: fileName,
+          base64: content,
+        })
+      }
+
+      try {
+        // 解析文件base64内容，转为geojson格式数据
+        const f = await client.dataConverter.shp2Geojson(contents)
+        for (const _f of f) {
+          _f && await MapUtil.importGeojson(_f, dsName)
+        }
+        ToolRefs.getLoading()?.setLoading(false)
+      } catch (error) {
+        ToolRefs.getLoading()?.setLoading(false)
       }
     })
   }
@@ -127,7 +192,7 @@ export default function DataImport(props: Props) {
       <View
         style={{
           position: 'absolute',
-          top: 60,
+          top: 80,
           bottom: 0,
           left: 0,
           right: 0,
@@ -141,22 +206,24 @@ export default function DataImport(props: Props) {
             width: '30%',
             marginLeft: 10,
           }}>
-          <TouchableOpacity
+          <ImageButton
             style={styles.methodBtn}
-            activeOpacity={0.8}
-            onPress={() => openDictGeoJson()}
-          >
-            <Image source={getAssets().icon_import} style={styles.methodBtnImg} />
-            <Text style={styles.methodBtnTxt}>Geojson</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+            image={getAssets().icon_import}
+            title={'Geojson'}
+            onPress={openDictGeoJson}
+          />
+          <ImageButton
             style={styles.methodBtn}
-            activeOpacity={0.8}
-            onPress={() => openDictExcel()}
-          >
-            <Image source={getAssets().icon_import} style={styles.methodBtnImg} />
-            <Text style={styles.methodBtnTxt}>Excel</Text>
-          </TouchableOpacity>
+            image={getAssets().icon_import}
+            title={'Excel'}
+            onPress={openDictExcel}
+          />
+          <ImageButton
+            style={styles.methodBtn}
+            image={getAssets().icon_import}
+            title={'Shp'}
+            onPress={openDictShp}
+          />
         </View>
       </View>
     )
@@ -195,7 +262,7 @@ export default function DataImport(props: Props) {
 
   const submit = () => {
     if (!excelData || !xName || !yName) {
-      console.error('请先选择经纬度字段')
+      ToolRefs.getToast()?.show('请先选择经纬度字段', 2000)
       return
     }
     MapUtil.importExcel({
@@ -210,7 +277,7 @@ export default function DataImport(props: Props) {
         // 刷新地图
         WebMapUtil.getClient()?.mapControl.refresh()
       } else {
-        console.error('导入失败')
+        ToolRefs.getToast()?.show('导入失败', 2000)
       }
     })
   }
@@ -282,19 +349,11 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    height: 60,
+    height: 50,
     width: 40,
     borderRadius: 4,
     backgroundColor: '#fff',
     marginTop: 20
-  },
-  methodBtnImg: {
-    height: 24,
-    width: 24,
-  },
-  methodBtnTxt: {
-    fontSize: 10,
-    marginTop: 4,
   },
   modelContainer: {
     position: 'absolute',
