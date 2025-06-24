@@ -29,6 +29,21 @@ const icon_line_black = require('./icon_line_black.png')
 const icon_point_black = require('./icon_point_black.png')
 const icon_region_black = require('./icon_region_black.png')
 
+const icon_editor = require('./icon_editor.png')
+const icon_aim = require('./icon_aim.png')
+const icon_aim_disabled = require('./icon_aim_disabled.png')
+const icon_hand_point = require('./icon_hand_point.png')
+const icon_hand_point_disabled = require('./icon_hand_point_disabled.png')
+
+const icon_node_add = require('./icon_node_add.png')
+const icon_node_delete = require('./icon_node_delete.png')
+const icon_node_edit = require('./icon_node_edit.png')
+const icon_node_move = require('./icon_node_move.png')
+const icon_node_select = require('./icon_node_select.png')
+const icon_submit_black = require('./icon_submit_black.png')
+const icon_close = require('./icon_close.png')
+
+
 const images = {
   icon_back,
   icon_import,
@@ -60,6 +75,20 @@ const images = {
   icon_line_black,
   icon_point_black,
   icon_region_black,
+
+  icon_editor,
+  icon_aim,
+  icon_aim_disabled,
+  icon_hand_point,
+  icon_hand_point_disabled,
+
+  icon_node_add,
+  icon_node_delete,
+  icon_node_edit,
+  icon_node_move,
+  icon_node_select,
+  icon_submit_black,
+  icon_close,
 }
 
 function getAssets(theme?: string) {

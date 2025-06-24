@@ -1480,7 +1480,7 @@
 "@mapplus/react-native-webmap@file:../react-native-webmap/dist/react-native-webmap.tgz":
   version "0.0.1"
   resolved "file:../react-native-webmap/dist/react-native-webmap.tgz"
-  integrity sha512-U9MInQixQDr3mmVN29tiiSU5aCBtL3ByZuXM4S7jBRaq/avNsuFKarFacLgIYR3INXTGVyDo1XCFctb1jT6Eww==
+  integrity sha512-eBlzKxP3FRsRkqqAw76fzxHHtmujjLiUyg0oKC5Be69JqfzEca1i48FFU1hjCMWYCgFrK9L87+Cu0UFzs/pndg==
 
 "@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1":
   version "5.1.1-v1"

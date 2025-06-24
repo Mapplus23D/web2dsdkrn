@@ -177,7 +177,6 @@ export default function ThemeLayer(props: Props) {
       default:
         break;
     }
-    console.log('createThemeLayer result:', theme)
     if (!theme) return
 
     let beforeLayerID = ''
@@ -187,8 +186,6 @@ export default function ThemeLayer(props: Props) {
     }
 
     const layers = await webmap.layers.getLayers()
-    console.log('layers:', layers)
-    console.log('beforeLayerID:', beforeLayerID)
 
     const themeLayerID = await webmap.layers.add({
       type: 'theme',
@@ -197,7 +194,6 @@ export default function ThemeLayer(props: Props) {
       geometryType: baseLayer.geometryType,
       sourceId: baseLayer.datasourceID,
     }, beforeLayerID)
-    console.log('add themeLayerID:', themeLayerID)
     if (themeLayerID) {
       if (type.includes('label')) {
         // 标签专题图

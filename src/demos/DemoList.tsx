@@ -48,16 +48,16 @@ const DemoList = ({ navigation }: Props) => {
             path: 'DataImport',
           },
           {
+            title: '对象编辑',
+            path: 'ObjectEdit',
+          },
+          {
             title: '专题图',
             path: 'ThemeLayer',
           },
           // {
           //   title: '图层风格',
           //   path: 'LayerStyle',
-          // },
-          // {
-          //   title: '对象编辑',
-          //   path: 'ObjectEdit',
           // },
           // {
           //   title: '对象属性',
