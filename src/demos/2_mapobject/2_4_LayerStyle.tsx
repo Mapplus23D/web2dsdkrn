@@ -1,43 +1,34 @@
 /**
- * 对象编辑Demo
+ * 图层样式Demo
  * 
- * 包含点、线、面、文本对象的点编辑，移动，节点删除，新增节点
+ * 包含点、线、面图层样式修改
+ * 
+ * 文本样式只能单个对象修改
  */
-import { AddSourceParam, Client, IClickEvent, IGeoJSONData, IGeoJSONFeature, IGeoJSONPoint, IGeometryEvent, ILicenseInfo, RTNWebMap } from '@mapplus/react-native-webmap'
+import { AddSourceParam, Client, IGeoJSONData, IGeoJSONFeature, IGeoJSONPoint, ILicenseInfo, RTNWebMap } from '@mapplus/react-native-webmap'
 import { useEffect, useRef, useState } from 'react'
-import { Image, ImageRequireSource, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { getAssets } from '../../assets'
-import { WebmapView } from '../../components'
+import { ImageButton, WebmapView } from '../../components'
 import BaseLayerData from '../../constants/BaseLayerData'
 import { DemoStackPageProps } from '../../navigators/types'
-import { LicenseUtil, MapUtil, WebMapUtil } from '../../utils'
+import { DataUtil, LicenseUtil, MapUtil, WebMapUtil } from '../../utils'
 
-
-interface Props extends DemoStackPageProps<'ObjectEdit'> { }
+interface Props extends DemoStackPageProps<'LayerStyle'> { }
 
 const TextLayer = 'text'
 const PointLayer = 'point'
 const LineLayer = 'line'
 const RegionLayer = 'region'
 
-interface SelectData { layerId: string, geometryId: number, type?: number }
-
 /**
  * 对象编辑
  * @param props 
  * @returns 
  */
-export default function ObjectEdit(props: Props) {
+export default function LayerStyle(props: Props) {
   const [license, setLicense] = useState<ILicenseInfo | undefined>()
   const [clientUrl, setClientUrl] = useState<string | undefined>()
-
-  const [isEdit, setIsEdit] = useState(false);
-  const [isMove, setIsMove] = useState(false);
-
-  const [selectData, setSelectData] = useState<SelectData>();
-
-  /** 准星图标句柄 用于获取屏幕坐标 */
-  const aimPointImageRef = useRef<Image>(null)
 
   const textLayerRef = useRef<{
     dsId: string,
@@ -63,19 +54,10 @@ export default function ObjectEdit(props: Props) {
     })
   }
 
-  useEffect(() => {
-    // 选中对象后，开始编辑
-    if (selectData) {
-      startEdit()
-    }
-  }, [selectData])
-
-  const onLoad = (client: Client) => {
+  const onLoad = async (client: Client) => {
     WebMapUtil.setClient(client);
     // 初始化图层
     initLayers()
-    // 添加选择监听
-    addSelectListener()
   }
 
   /**
@@ -228,27 +210,10 @@ export default function ObjectEdit(props: Props) {
     addRegion()
   }
 
-  /** 添加选择监听 */
-  const addSelectListener = () => {
-    const client = WebMapUtil.getClient();
-    if (!client) return;
-    // 监听对象被选中事件
-    client.addListener('onSelect', selectHandler);
-  }
-
-  /** 移除选择监听 */
-  const removeSelectListener = () => {
-    const client = WebMapUtil.getClient();
-    if (!client) return;
-    // 监听对象被选中事件
-    client.removeListener('onSelect', selectHandler);
-  }
-
   useEffect(() => {
     // 激活 sdk 许可
     initLicense()
     return () => {
-      removeSelectListener()
       // 退出页面，关闭地图
       WebMapUtil.getClient()?.mapControl.closeMap()
       WebMapUtil.setClient(null)
@@ -264,120 +229,6 @@ export default function ObjectEdit(props: Props) {
       }
     }
   }, [license])
-
-  /**
-   * 开始编辑
-   * @param method 
-   * @returns 
-   */
-  const startEdit = async () => {
-    const client = WebMapUtil.getClient();
-    if (!client || !selectData) return;
-
-    // 设置选择集操作参数
-    client.mapControl.setSelectOption({
-      /** 是否支持框选手势，默认false  */
-      boxSelectEnable: false,
-      /** 累加选择，默认false  ps.按shift时强制进入累加选择模式*/
-      accumulative: false,
-      /** 累加选择时是否通过框选取消选择状态，默认false  */
-      boxUnselectWhenAccumulative: false,
-      /** 点击空白处取消选择，默认false  ps.单击鼠标右键强制取消选择 */
-      cancleWhenClickNone: true,
-      /** 允许拖动选中的可编辑对象，默认false */
-      featureDragEnable: false,
-      /** 允许删除选中的可编辑对象，默认false */
-      featureTrashEnable: true,
-    })
-    setIsMove(false)
-    client.mapControl.setAction(client.Action.edit_vertex)
-
-  }
-
-  const startMove = async () => {
-    const client = WebMapUtil.getClient();
-    if (!client || !selectData) return;
-
-    // 设置选择集操作参数
-    client.mapControl.setSelectOption({
-      /** 是否支持框选手势，默认false  */
-      boxSelectEnable: false,
-      /** 累加选择，默认false  ps.按shift时强制进入累加选择模式*/
-      accumulative: false,
-      /** 累加选择时是否通过框选取消选择状态，默认false  */
-      boxUnselectWhenAccumulative: false,
-      /** 点击空白处取消选择，默认false  ps.单击鼠标右键强制取消选择 */
-      cancleWhenClickNone: true,
-      /** 允许拖动选中的可编辑对象，默认false */
-      featureDragEnable: true,
-      /** 允许删除选中的可编辑对象，默认false */
-      featureTrashEnable: true,
-    })
-    setIsMove(true)
-    client.mapControl.setAction(client.Action.select)
-  }
-
-  const selectHandler = async (data: {
-    /**
-     * 返回选中的对象数组
-     */
-    geometries: IGeometryEvent[];
-    event: IClickEvent;
-  }) => {
-    const client = WebMapUtil.getClient();
-    if (!client || isMove) return;
-
-    if (data.geometries.length > 0) {
-      // 编辑对象之前，要设置对象所在图层可编辑
-      await client.layers.setEditable(data.geometries[0].layerId, true)
-      // 把要编辑的对象设置为编辑状态
-      await client.mapControl.appointEditGeometry(data.geometries[0].layerId, data.geometries[0].geometryId)
-      setSelectData({
-        layerId: data.geometries[0].layerId,
-        geometryId: data.geometries[0].geometryId,
-      })
-    }
-  }
-
-  /** 编辑按钮 */
-  const editAction = (edit?: boolean) => {
-    const client = WebMapUtil.getClient();
-    if (!client) return;
-    let _edit = !isEdit
-    if (edit !== undefined) _edit = edit
-    if (!_edit) {
-      // 取消编辑状态
-      client.mapControl.setAction(client.Action.pan);
-      // 取消选中对象
-      setSelectData(undefined)
-    } else {
-      client.mapControl.setAction(client.Action.select);
-    }
-    setIsEdit(_edit);
-  }
-
-  /** 取消 */
-  const cancel = async () => {
-    const client = WebMapUtil.getClient();
-    if (!client) return;
-    client.mapControl.setAction(client.Action.select);
-    // 取消后，设置为不可拖动 和 不可删除
-    client.mapControl.setSelectOption({
-      /** 是否支持框选手势，默认false  */
-      boxSelectEnable: false,
-      /** 累加选择，默认false  ps.按shift时强制进入累加选择模式*/
-      accumulative: false,
-      /** 累加选择时是否通过框选取消选择状态，默认false  */
-      boxUnselectWhenAccumulative: false,
-      /** 点击空白处取消选择，默认false  ps.单击鼠标右键强制取消选择 */
-      cancleWhenClickNone: true,
-      /** 允许拖动选中的可编辑对象，默认false */
-      featureDragEnable: false,
-      /** 允许删除选中的可编辑对象，默认false */
-      featureTrashEnable: false,
-    })
-    setIsMove(false)
-  }
 
   /**
    * 坐标转换为地图坐标
@@ -537,69 +388,61 @@ export default function ObjectEdit(props: Props) {
     }
   }
 
-  /** 删除节点 */
-  const deleteNode = async () => {
-    const client = WebMapUtil.getClient();
-    if (!client || !selectData) return;
-    // 删除节点
-    client.mapControl.trash()
-  }
-
-  /** 编辑后提交 */
-  const submit = async () => {
-    const client = WebMapUtil.getClient();
-    if (!client || !selectData) return;
-
-    // 修改后提交
-    client.mapControl.submit()
-    // 修改为不可平移状态
-    setIsMove(false)
-    // 修改为选择模式
-    client.mapControl.setAction(client.Action.select)
-  }
-
   /**
-   * 图片按钮
-   * @param image 
+   * 修改图层样式
    * @returns 
    */
-  const renderImageBtn = (image: ImageRequireSource, title: string, action: () => void, isSelected?: boolean) => {
-    return (
-      <TouchableOpacity
-        style={[styles.imgBtn, isSelected && { backgroundColor: '#4680DF' }]}
-        onPress={() => {
-          if (!selectData) return
-          action()
-        }}
-      >
-        <Image source={image} style={{ width: 30, height: 30 }} />
-        <Text style={{ fontSize: 10, color: '#000' }}>{title}</Text>
-      </TouchableOpacity>
-    )
-  }
-
-  /**
-   * 编辑视图
-   * @returns 
-   */
-  const renderToolsView = () => {
+  const changeStyle = () => {
     const client = WebMapUtil.getClient();
-    if (!selectData || !client) return null
+    if (!client) return;
 
-    return (
-      <View style={styles.editBar}>
-        <View style={styles.rowContent}>
-          {renderImageBtn(getAssets().icon_editor, '编辑', startEdit)}
-          {renderImageBtn(getAssets().icon_node_delete, '删除节点', deleteNode)}
-        </View>
-
-        <View style={styles.rowContent}>
-          {renderImageBtn(getAssets().icon_node_move, '平移', startMove, isMove)}
-          {renderImageBtn(getAssets().icon_submit_black, '提交', submit)}
-          {renderImageBtn(getAssets().icon_close, '取消', cancel)}
-        </View>
-      </View>
-    )
+    if (regionLayerRef.current) {
+      // 修改面样式
+      client.layers.changeLayerStyle(regionLayerRef.current.layerId, {
+        fillColor: DataUtil.randomColor(),
+        fillOpacity: Math.random(),
+        fillOutlineWidth: Math.random() * 10,
+        fillOutlineColor: DataUtil.randomColor(),
+      })
+    }
+    if (lineLayerRef.current) {
+      // 修改线样式
+      client.layers.changeLayerStyle(lineLayerRef.current.layerId, {
+        // 线颜色
+        lineColor: DataUtil.randomColor(),
+        // 线宽。默认 1px
+        lineWidth: Math.random() * 30,
+        // 线不透明度。0 透明， 1 不透明
+        lineOpacity: Math.random(),
+      })
+    }
+    if (pointLayerRef.current) {
+      // 修改点样式
+      client.layers.changeLayerStyle(pointLayerRef.current.layerId, {
+        // 点颜色
+        circleColor: DataUtil.randomColor(),
+        // 纯色点轮廓颜色,默认白色
+        circleOutlineColor: DataUtil.randomColor(),
+        // 纯色轮廓宽度，单位像素，默认0px
+        circleOutlineWidth: Math.random() * 10,
+        // 点大小，单位像素，默认5px
+        circleRadius: Math.random() * 5,
+      })
+    }
+    if (textLayerRef.current) {
+      // 修改点样式
+      client.layers.changeTextStyle(textLayerRef.current.layerId, [0], {
+        // 文本颜色
+        textColor: DataUtil.randomColor(),
+        // 字体大小 默认 16px
+        textSize: Math.random() * 20 + 8,
+        // 文本不透明度
+        textOpacity: Math.random() * 10,
+        // 旋转角度
+        textRotate: Math.random() * 360,
+      })
+      client.layers.refresh(textLayerRef.current.layerId)
+    }
   }
 
   /**
@@ -625,24 +468,11 @@ export default function ObjectEdit(props: Props) {
             width: '30%',
             marginLeft: 10,
           }}>
-          <TouchableOpacity
-            style={[styles.methodBtn, { backgroundColor: isEdit ? '#4680DF' : '#fff' }]}
-            activeOpacity={0.8}
-            onPress={() => editAction()}
-          >
-            <Image source={getAssets().icon_editor} style={styles.methodBtnImg} />
-          </TouchableOpacity>
-        </View>
-      </View>
-    )
-  }
-
-  const renderTips = () => {
-    if (!isEdit || selectData) return null
-    return (
-      <View style={styles.tipsView}>
-        <View style={styles.tips}>
-          <Text style={styles.tipsTxt}>请选择对象</Text>
+          <ImageButton
+            style={styles.methodBtn}
+            image={getAssets().icon_style_black}
+            onPress={changeStyle}
+          />
         </View>
       </View>
     )
@@ -656,61 +486,12 @@ export default function ObjectEdit(props: Props) {
       onInited={onLoad}
       navigation={props.navigation}
     >
-      {renderTips()}
       {renderTools()}
-      {renderToolsView()}
     </WebmapView>
   )
 }
 
 const styles = StyleSheet.create({
-  editBar: {
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: '#fff',
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    padding: 10,
-  },
-  rowView: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 60,
-    width: '100%',
-  },
-  rowTitle: {
-    fontSize: 14,
-    color: '#000',
-    width: 50,
-  },
-  rowContent: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 60,
-  },
-  input: {
-    flex: 1,
-    backgroundColor: '#efefef',
-    height: 40,
-    color: '#000',
-    borderRadius: 4,
-    textAlign: 'center',
-  },
-  imgBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 4,
-    borderRadius: 4,
-    height: 40,
-    width: '25%',
-  },
-
   methodBtn: {
     display: 'flex',
     justifyContent: 'center',
@@ -725,24 +506,4 @@ const styles = StyleSheet.create({
     height: 30,
     width: 30,
   },
-  tipsView: {
-    position: 'absolute',
-    top: 20,
-    left: 0,
-    height: 30,
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  tips: {
-    backgroundColor: '#rgba(0,0,0,0.3)',
-    padding: 8,
-    borderRadius: 5,
-    textAlign: 'center',
-  },
-  tipsTxt: {
-    color: '#fff',
-    fontSize: 14,
-  }
 });

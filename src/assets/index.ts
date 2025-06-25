@@ -43,6 +43,7 @@ const icon_node_select = require('./icon_node_select.png')
 const icon_submit_black = require('./icon_submit_black.png')
 const icon_close = require('./icon_close.png')
 
+const icon_style_black = require('./icon_style_black.png')
 
 const images = {
   icon_back,
@@ -89,6 +90,8 @@ const images = {
   icon_node_select,
   icon_submit_black,
   icon_close,
+
+  icon_style_black,
 }
 
 function getAssets(theme?: string) {

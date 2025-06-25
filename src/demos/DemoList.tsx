@@ -52,6 +52,10 @@ const DemoList = ({ navigation }: Props) => {
             path: 'ObjectEdit',
           },
           {
+            title: '图层样式',
+            path: 'LayerStyle',
+          },
+          {
             title: '专题图',
             path: 'ThemeLayer',
           },

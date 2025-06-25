@@ -22,7 +22,7 @@ export default function ThemeLayer(props: Props) {
   const [baseLayer, setBaseLayer] = useState<{
     datasourceID: string,
     geometryType: IGeometryType,
-    layerName: string,
+    layerId: string,
   } | undefined>()
 
   const currentThemeLayer = useRef<{

@@ -77,7 +77,7 @@ export const importGeojson = async (content: IGeoJSONData, dsName: string) => {
   const importResult: {
     datasourceID: string,
     geometryType: IGeometryType,
-    layerName: string,
+    layerId: string,
   }[] = []
   for (const item of result) {
     const ds = await webmap.datasources.add({
@@ -91,15 +91,15 @@ export const importGeojson = async (content: IGeoJSONData, dsName: string) => {
       geometryType: item.type,
     })
     if (ds) {
-      const layerName = await addLayer({
+      const layerId = await addLayer({
         geometryType: item.type,
         dsId: ds,
         name: dsName,
       })
-      layerName && ds && importResult.push({
+      layerId && ds && importResult.push({
         datasourceID: ds,
         geometryType: item.type,
-        layerName: layerName,
+        layerId: layerId,
       })
     }
   }

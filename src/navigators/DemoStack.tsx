@@ -3,6 +3,7 @@ import BaseMap from '../demos/1_basemap/1_1_BaseMap';
 import DrawObject from '../demos/2_mapobject/2_1_DrawObject';
 import DrawText from '../demos/2_mapobject/2_2_DrawText';
 import DataImport from '../demos/2_mapobject/2_3_DataImport';
+import LayerStyle from '../demos/2_mapobject/2_4_LayerStyle';
 import ObjectEdit from '../demos/2_mapobject/2_5_ObjectEdit';
 import ThemeLayer from '../demos/2_mapobject/2_7_ThemeLayer';
 import DemoList from '../demos/DemoList';
@@ -25,6 +26,7 @@ export default function DemoStack() {
       <Stack.Screen name="ThemeLayer" component={ThemeLayer} />
       <Stack.Screen name="ObjectEdit" component={ObjectEdit} />
       <Stack.Screen name="DataImport" component={DataImport} />
+      <Stack.Screen name="LayerStyle" component={LayerStyle} />
     </Stack.Navigator>
   );
 }
