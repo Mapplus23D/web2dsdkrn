@@ -1,14 +1,11 @@
 import { TurboModule } from "@rnoh/react-native-openharmony";
 import { TM } from "@rnoh/react-native-openharmony/generated";
-import { stream  } from '@kit.ArkTS';
 
 import abilityAccessCtrl, { Permissions } from '@ohos.abilityAccessCtrl';
-// import  { fileIo, picker } from '@kit.CoreFileKit';
 import { common } from '@kit.AbilityKit';
-import { BusinessError } from '@kit.BasicServicesKit';
-import { buffer, util } from "@kit.ArkTS";
-import fileShare from '@ohos.fileshare';
-import { Environment, fileUri, picker } from '@kit.CoreFileKit';
+import { BusinessError, zlib } from '@kit.BasicServicesKit';
+import { buffer } from "@kit.ArkTS";
+import { fileUri, picker } from '@kit.CoreFileKit';
 import fs from '@ohos.file.fs';
 
 export class HTools extends TurboModule implements TM.RTNHTools.Spec {
@@ -198,5 +195,26 @@ export class HTools extends TurboModule implements TM.RTNHTools.Spec {
       }
     });
   }
- 
+
+  async unzipFile(inFile: string, outFile: string): Promise<boolean> {
+    return new Promise(resolve => {
+      try {
+        let options: zlib.Options = {
+          level: zlib.CompressLevel.COMPRESS_LEVEL_DEFAULT_COMPRESSION,
+          memLevel: zlib.MemLevel.MEM_LEVEL_DEFAULT,
+          strategy: zlib.CompressStrategy.COMPRESS_STRATEGY_DEFAULT_STRATEGY
+        };
+
+        zlib.decompressFile(inFile, outFile, options).then((data: void) => {
+          console.info('unzipFile result is ' + JSON.stringify(data));
+          resolve(true);
+        }).catch((err: BusinessError) => {
+          console.error('error is ' + JSON.stringify(err));
+          resolve(false);
+        })
+      } catch (e) {
+        resolve(false);
+      }
+    });
+  }
 }

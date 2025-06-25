@@ -33,6 +33,7 @@
     "@react-native-oh-tpl/react-native-safe-area-context": "^4.7.4-0.2.1",
     "@react-native-oh-tpl/react-native-webview": "^13.10.2-0.3.0",
     "@react-native-oh/react-native-harmony": "0.72.67",
+    "@react-native-ohos/react-native-fs": "^2.20.1-rc.2",
     "@react-navigation/bottom-tabs": "^6.5.11",
     "@react-navigation/native": "^6.1.17",
     "@react-navigation/stack": "^6.3.19",

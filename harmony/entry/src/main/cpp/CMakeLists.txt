@@ -14,6 +14,7 @@ set(WITH_HITRACE_SYSTRACE 1) # for other CMakeLists.txt files to use
 add_subdirectory("${OH_MODULE_DIR}/@react-native-oh-tpl/react-native-safe-area-context/src/main/cpp" ./safe-area)
 add_subdirectory("${OH_MODULE_DIR}/@mapplus/react-native-webmap/src/main/cpp" ./webmap)
 add_subdirectory("${OH_MODULE_DIR}/@react-native-oh-tpl/react-native-webview/src/main/cpp" ./webview)
+add_subdirectory("${OH_MODULE_DIR}/@react-native-ohos/react-native-fs/src/main/cpp" ./fs)
 
 add_subdirectory("${RNOH_CPP_DIR}" ./rn)
 file(GLOB GENERATED_CPP_FILES "./generated/*.cpp")
@@ -27,3 +28,4 @@ target_link_libraries(rnoh_app PUBLIC rnoh)
 target_link_libraries(rnoh_app PUBLIC rnoh_safe_area)
 target_link_libraries(rnoh_app PUBLIC rnoh_webmap)
 target_link_libraries(rnoh_app PUBLIC rnoh_webview)
+target_link_libraries(rnoh_app PUBLIC rnoh_fs)

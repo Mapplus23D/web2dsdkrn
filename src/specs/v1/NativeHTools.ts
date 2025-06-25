@@ -120,6 +120,8 @@ export interface Spec extends TurboModule {
   writeFile(filepath: string, value: string): Promise<boolean>
 
   copyDir(path: string, dest: string): Promise<boolean>
+
+  unzipFile(inFile: string, outFile: string): Promise<boolean>
 }
 
 export default TurboModuleRegistry.get<Spec>(

@@ -3,6 +3,7 @@ import { WebViewPackage } from '@react-native-oh-tpl/react-native-webview/ts';
 import { SafeAreaViewPackage } from '@react-native-oh-tpl/react-native-safe-area-context';
 import { WebMapPackage }  from '@mapplus/react-native-webmap/ts'
 import { GeneratedPackage } from './GeneratedPackage';
+import { FsPackage } from '@react-native-ohos/react-native-fs/ts';
 
 export function createRNPackages(ctx: RNPackageContext): RNPackage[] {
   return [
@@ -10,5 +11,6 @@ export function createRNPackages(ctx: RNPackageContext): RNPackage[] {
     new SafeAreaViewPackage(ctx),
     new WebMapPackage(ctx),
     new GeneratedPackage(ctx),
+    new FsPackage(ctx),
   ];
 }

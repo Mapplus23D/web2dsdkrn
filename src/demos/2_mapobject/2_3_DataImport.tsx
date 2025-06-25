@@ -1,4 +1,5 @@
 import { Client, ExcelData, IFieldInfo, ILicenseInfo, RTNWebMap } from '@mapplus/react-native-webmap'
+import RNFS from '@react-native-ohos/react-native-fs'
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { getAssets } from '../../assets'
@@ -17,6 +18,8 @@ interface Props extends DemoStackPageProps<'DataImport'> { }
  * 2. 导入 Excel 数据
  *    - 选择经纬度字段
  *    - 导入数据到地图
+ * 3. 导入 shp 数据
+ * 4. 导入 shp 的zip文件数据
  * @param props 
  * @returns 
  */
@@ -42,7 +45,6 @@ export default function DataImport(props: Props) {
   const initLayers = async () => {
     const webmap = WebMapUtil.getClient()
     if (!webmap) return
-
     // 添加默认底图
     const dss = await BaseLayerData.image[0].action()
     for (const ds of dss) {
@@ -186,6 +188,79 @@ export default function DataImport(props: Props) {
     })
   }
 
+
+
+  /**
+   * 打开文件管理器，选择 shp 的zip文件
+   */
+  const openDictShpZip = async () => {
+    NativeHTools?.openDoc({
+      fileSuffixFilters: ['文档|zip'],
+      maxSelectNumber: 1, // 最大选择数量
+      // 默认文件路径
+      defaultFilePathUri: 'file://docs/storage/Users/currentUser/test',
+    }).then(async (files) => {
+      const client = WebMapUtil.getClient()
+      if (!client || files.length <= 0) return
+      ToolRefs.getLoading()?.setLoading(true, {
+        info: '正在解压数据...',
+      })
+      const fileName = files[0].substring(files[0].lastIndexOf('/') + 1)
+      const fileNameWithoutExt = files[0].substring(files[0].lastIndexOf('/') + 1, files[0].lastIndexOf('.'))
+
+      const zipFile = RNFS.DocumentDirectoryPath + '/' + fileName
+      const targetDirPath = RNFS.DocumentDirectoryPath + '/' + fileNameWithoutExt
+
+      // 把zip文件从外部目录拷贝到内部目录
+      await NativeHTools?.copyDir(files[0], zipFile)
+      // 把内部目录的zip文件解压
+      await NativeHTools?.unzipFile(zipFile, RNFS.DocumentDirectoryPath)
+      // 读取解压后的文件目录
+      let _files: string[] = await RNFS.readdir(targetDirPath) || []
+      if (!_files) return
+      // 补全文件路径
+      _files = _files.map((item: string) => targetDirPath + '/' + item)
+      ToolRefs.getLoading()?.setLoading(true, {
+        info: '正在导入数据...',
+      })
+      const contents: {
+        type: "base64";
+        fileName: string;
+        base64: string;
+      }[] = []
+      let dsName = ''
+      // 读取shp相关文件的base64内容，放到数组中
+      for (const file of _files) {
+        const fileName = file.substring(file.lastIndexOf('/') + 1)
+        const content = await NativeHTools?.readFile(file, 'base64')
+
+        if (!dsName) {
+          dsName = fileName.substring(0, fileName.lastIndexOf('.'))
+        }
+
+        content && contents.push({
+          type: "base64",
+          fileName: fileName,
+          base64: content,
+        })
+      }
+
+      try {
+        // 解析文件base64内容，转为geojson格式数据
+        const f = await client.dataConverter.shp2Geojson(contents)
+        for (const _f of f) {
+          _f && await MapUtil.importGeojson(_f, dsName)
+        }
+        // 删除内部zip包和解压后的文件夹
+        await RNFS.unlink(zipFile)
+        await RNFS.unlink(targetDirPath)
+        ToolRefs.getLoading()?.setLoading(false)
+      } catch (error) {
+        ToolRefs.getLoading()?.setLoading(false)
+      }
+    })
+  }
+
   /** 左侧工具栏 */
   const _renderTools = () => {
     return (
@@ -223,6 +298,12 @@ export default function DataImport(props: Props) {
             image={getAssets().icon_import}
             title={'Shp'}
             onPress={openDictShp}
+          />
+          <ImageButton
+            style={styles.methodBtn}
+            image={getAssets().icon_import}
+            title={'Shp Zip'}
+            onPress={openDictShpZip}
           />
         </View>
       </View>
