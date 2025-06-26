@@ -1,7 +1,7 @@
 import { Image, ImageSourcePropType, ImageStyle, StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, ViewStyle } from 'react-native'
 
 export default function ImageButton(props: {
-  image: ImageSourcePropType
+  image?: ImageSourcePropType
   title?: string
   onPress: () => void
   style?: StyleProp<ViewStyle>
@@ -14,7 +14,9 @@ export default function ImageButton(props: {
       activeOpacity={0.8}
       onPress={() => props.onPress()}
     >
-      <Image source={props.image} style={[styles.methodBtnImg, props.imageStyle]} />
+      {
+        props.image && <Image source={props.image} style={[styles.methodBtnImg, props.imageStyle]} />
+      }
       {
         props.title && <Text style={[styles.methodBtnTxt, props.textStyle]}>{props.title}</Text>
       }

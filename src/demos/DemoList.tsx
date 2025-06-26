@@ -59,6 +59,10 @@ const DemoList = ({ navigation }: Props) => {
             title: '专题图',
             path: 'ThemeLayer',
           },
+          {
+            title: '测量',
+            path: 'Measure',
+          },
           // {
           //   title: '图层风格',
           //   path: 'LayerStyle',

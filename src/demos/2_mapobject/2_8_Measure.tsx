@@ -1,0 +1,395 @@
+/**
+ * 对象编辑Demo
+ * 
+ * 包含点、线、面、文本对象的点编辑，移动，节点删除，新增节点
+ */
+import { Client, IGeoJSONFeature, ILicenseInfo, RTNWebMap } from '@mapplus/react-native-webmap'
+import { useEffect, useState } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
+import { ImageButton, WebmapView } from '../../components'
+import BaseLayerData from '../../constants/BaseLayerData'
+import { DemoStackPageProps } from '../../navigators/types'
+import { DataUtil, LicenseUtil, WebMapUtil } from '../../utils'
+
+enum MeasureType {
+  NULL,
+  LENGTH,
+  AREA,
+  ANGLE,
+}
+
+
+interface Props extends DemoStackPageProps<'Measure'> { }
+
+/**
+ * 对象编辑
+ * @param props 
+ * @returns 
+ */
+export default function Measure(props: Props) {
+  const [license, setLicense] = useState<ILicenseInfo | undefined>()
+  const [clientUrl, setClientUrl] = useState<string | undefined>()
+
+  const [measureValue, setMeasureValue] = useState('')
+  const [measureType, setMeasureType] = useState<MeasureType>(MeasureType.NULL)
+
+  /** 激活许可 */
+  const initLicense = () => {
+    LicenseUtil.active().then(res => {
+      setLicense(res)
+    })
+  }
+
+  const onLoad = (client: Client) => {
+    WebMapUtil.setClient(client);
+    // 添加测量监听
+    addMeasureListener()
+    initLayers()
+  }
+
+  /**
+   * 地图定位到当前位置
+   */
+  const flyToInitPosition = async () => {
+    const client = WebMapUtil.getClient();
+    if (!client) return;
+
+    // 坐标转换为地图坐标系
+    const geo = await DataUtil.transGeoByCRS({
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [104.09197291173261, 30.522202566573696],
+      }
+    }, 'wgs84', 'gcj02') as IGeoJSONFeature
+    if (!geo || !geo.geometry || geo.geometry.type !== 'Point') return;
+    await client.mapControl.flyTo({
+      center: {
+        //经度
+        x: geo.geometry.coordinates[0],
+        //维度
+        y: geo.geometry.coordinates[1],
+      },
+      duration: 1000,
+      scale: 2.4911532365316153e-4,
+    });
+  }
+
+  /** 初始化默认图层 */
+  const initLayers = async () => {
+    const client = WebMapUtil.getClient();
+    if (!client) return;
+
+    // 添加默认底图
+    const dss = await BaseLayerData.image[0].action()
+    for (const ds of dss) {
+      ds && await client.baseLayers.add({
+        sourceId: ds.id,
+        name: ds.name,
+        type: 'image'
+      })
+    }
+
+    // 定位到初始位置
+    flyToInitPosition()
+  }
+
+  const onMeasure = (event: {
+    measureResult: string;
+    isFinishied?: boolean;
+  }) => {
+    console.log(event)
+    if (event.isFinishied) {
+      setMeasureValue('')
+      // window.removeEventListener('mousemove', updatePosition)
+      return
+    }
+    setMeasureValue(event.measureResult)
+    // window.addEventListener('mousemove', updatePosition)
+  }
+
+  /** 添加选择监听 */
+  const addMeasureListener = () => {
+    const client = WebMapUtil.getClient();
+    if (!client) return;
+    // 监听对象被选中事件
+    client.addListener('onMeasureResult', onMeasure)
+    client.mapControl.setSelectOption({
+      /** 是否支持框选手势，默认false  */
+      boxSelectEnable: false,
+      /** 累加选择，默认false  ps.按shift时强制进入累加选择模式*/
+      accumulative: false,
+      /** 累加选择时是否通过框选取消选择状态，默认false  */
+      boxUnselectWhenAccumulative: false,
+      /** 点击空白处取消选择，默认false  ps.单击鼠标右键强制取消选择 */
+      cancleWhenClickNone: true,
+      /** 允许拖动选中的可编辑对象，默认false */
+      featureDragEnable: false,
+      /** 允许删除选中的可编辑对象，默认false */
+      featureTrashEnable: false,
+    })
+  }
+
+  /** 移除选择监听 */
+  const removeMeasureListener = () => {
+    const client = WebMapUtil.getClient();
+    if (!client) return;
+    // 监听对象被选中事件
+    client.removeListener('onMeasureResult', onMeasure);
+  }
+
+  useEffect(() => {
+    // 激活 sdk 许可
+    initLicense()
+    return () => {
+      removeMeasureListener()
+      // 退出页面，关闭地图
+      WebMapUtil.getClient()?.mapControl.closeMap()
+      WebMapUtil.setClient(null)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (license) {
+      // 获取 sdk web 服务地址
+      const res = RTNWebMap?.getClientUrl()
+      if (res) {
+        setClientUrl(res)
+      }
+    }
+  }, [license])
+
+  /** 提交 */
+  const submit = () => {
+    const client = WebMapUtil.getClient();
+    if (!client) return;
+    client.mapControl.submit()
+  }
+
+  const clear = () => {
+    const client = WebMapUtil.getClient();
+    if (!client) return;
+    client.mapControl.trash()
+  }
+
+  /** 距离量算 */
+  const lengthMeasure = async () => {
+    const client = WebMapUtil.getClient();
+    if (!client) return;
+    const currentAction = await client.mapControl.getAction()
+    if (currentAction === client.Action.measure_length) {
+      client.mapControl.setAction(client.Action.pan)
+      setMeasureType(MeasureType.NULL)
+    } else {
+      client.mapControl.setAction(client.Action.measure_length)
+      setMeasureType(MeasureType.LENGTH)
+    }
+  }
+
+  /** 面积量算 */
+  const areaMeasure = async () => {
+    const client = WebMapUtil.getClient();
+    if (!client) return;
+    const currentAction = await client.mapControl.getAction()
+    if (currentAction === client.Action.measure_area) {
+      client.mapControl.setAction(client.Action.pan)
+      setMeasureType(MeasureType.NULL)
+    } else {
+      client.mapControl.setAction(client.Action.measure_area)
+      setMeasureType(MeasureType.AREA)
+    }
+  }
+
+  /** 角度量算 */
+  const angleMeasure = async () => {
+    const client = WebMapUtil.getClient();
+    if (!client) return;
+    const currentAction = await client.mapControl.getAction()
+    if (currentAction === client.Action.measure_angle) {
+      client.mapControl.setAction(client.Action.pan)
+      setMeasureType(MeasureType.NULL)
+    } else {
+      client.mapControl.setAction(client.Action.measure_angle)
+      setMeasureType(MeasureType.ANGLE)
+    }
+  }
+
+  /**
+   * 侧边工具栏
+   * @returns 
+   */
+  const renderTools = () => {
+    return (
+      <View
+        style={{
+          position: 'absolute',
+          top: 80,
+          left: 10,
+          width: 40,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+        }}
+      >
+        <ImageButton
+          style={[styles.methodBtn, measureType === MeasureType.LENGTH && { backgroundColor: '#3499E5' }]}
+          title={'距离'}
+          onPress={lengthMeasure}
+        />
+        <ImageButton
+          style={[styles.methodBtn, measureType === MeasureType.AREA && { backgroundColor: '#3499E5' }]}
+          title={'面积'}
+          onPress={areaMeasure}
+        />
+        <ImageButton
+          style={[styles.methodBtn, measureType === MeasureType.ANGLE && { backgroundColor: '#3499E5' }]}
+          title={'角度'}
+          onPress={angleMeasure}
+        />
+      </View>
+    )
+  }
+
+
+
+  /**
+   * 侧边工具栏
+   * @returns 
+   */
+  const renderTools2 = () => {
+    if (measureType !== MeasureType.NULL)
+      return (
+        <View
+          style={{
+            position: 'absolute',
+            top: 80,
+            right: 10,
+            width: 40,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+          }}
+        >
+          <ImageButton
+            style={styles.methodBtn}
+            title={'确定'}
+            onPress={submit}
+          />
+          <ImageButton
+            style={styles.methodBtn}
+            title={'清除'}
+            onPress={clear}
+          />
+        </View>
+      )
+  }
+
+  const renderTips = () => {
+    // if (!isEdit || selectData) return null
+    return (
+      <View style={styles.tipsView}>
+        <View style={styles.tips}>
+          <Text style={styles.tipsTxt}>请选择对象</Text>
+        </View>
+      </View>
+    )
+  }
+
+  if (!license || !clientUrl) return null
+
+  return (
+    <WebmapView
+      clientUrl={clientUrl}
+      onInited={onLoad}
+      navigation={props.navigation}
+    >
+      {/* {renderTips()} */}
+      {renderTools()}
+      {renderTools2()}
+    </WebmapView>
+  )
+}
+
+const styles = StyleSheet.create({
+  editBar: {
+    display: 'flex',
+    flexDirection: 'column',
+    backgroundColor: '#fff',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: 10,
+  },
+  rowView: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 60,
+    width: '100%',
+  },
+  rowTitle: {
+    fontSize: 14,
+    color: '#000',
+    width: 50,
+  },
+  rowContent: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 60,
+  },
+  input: {
+    flex: 1,
+    backgroundColor: '#efefef',
+    height: 40,
+    color: '#000',
+    borderRadius: 4,
+    textAlign: 'center',
+  },
+  imgBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 4,
+    borderRadius: 4,
+    height: 40,
+    width: '25%',
+  },
+
+  methodBtn: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 40,
+    width: 40,
+    borderRadius: 4,
+    backgroundColor: '#fff',
+    marginTop: 20
+  },
+  methodBtnImg: {
+    height: 30,
+    width: 30,
+  },
+  tipsView: {
+    position: 'absolute',
+    top: 20,
+    left: 0,
+    height: 30,
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tips: {
+    backgroundColor: '#rgba(0,0,0,0.3)',
+    padding: 8,
+    borderRadius: 5,
+    textAlign: 'center',
+  },
+  tipsTxt: {
+    color: '#fff',
+    fontSize: 14,
+  }
+});
