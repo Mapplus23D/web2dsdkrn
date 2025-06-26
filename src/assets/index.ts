@@ -2,6 +2,8 @@ const icon_back = require('./icon_back.png')
 const icon_import = require('./icon_import.png')
 const icon_loading = require('./icon_loading.png')
 const icon_delete_black = require('./icon_delete_black.png')
+const icon_save = require('./icon_save.png')
+const icon_doc = require('./icon_doc.png')
 
 //Layer
 const bg_base_4d = require('./baseLayer/bg_base_4d.png')
@@ -47,11 +49,15 @@ const icon_close = require('./icon_close.png')
 const icon_style_black = require('./icon_style_black.png')
 const icon_symbol = require('./icon_symbol.png')
 
+const icon_theme = require('./icon_theme.png')
+
 const images = {
   icon_back,
   icon_import,
   icon_loading,
   icon_delete_black,
+  icon_save,
+  icon_doc,
 
   // Layer
   bg_base_4d,
@@ -96,6 +102,8 @@ const images = {
 
   icon_style_black,
   icon_symbol,
+
+  icon_theme,
 }
 
 function getAssets(theme?: string) {

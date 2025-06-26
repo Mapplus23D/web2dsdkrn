@@ -6,7 +6,8 @@ import { ImageButton } from '../../components'
 import WebmapView from '../../components/WebmapView'
 import BaseLayerData from '../../constants/BaseLayerData'
 import { DemoStackPageProps } from '../../navigators/types'
-import { LicenseUtil, MapUtil, WebMapUtil } from '../../utils'
+import NativeHTools from '../../specs/v1/NativeHTools'
+import { DataUtil, LicenseUtil, MapUtil, ToolRefs, WebMapUtil } from '../../utils'
 const exampleData = require('../../example/ThemeMap.json')
 
 interface Props extends DemoStackPageProps<'ThemeLayer'> { }
@@ -87,6 +88,32 @@ export default function ThemeLayer(props: Props) {
   }
 
   /**
+   * 保存地图
+   * @returns 
+   */
+  const save = async () => {
+    const client = WebMapUtil.getClient()
+    if (!client) return
+    const map = await client.mapControl.getMap()
+    // 打开文件管理器，选择保存文件位置
+    NativeHTools?.openDocSave({
+      // 默认文件路径
+      defaultFilePathUri: 'file://docs/storage/Users/currentUser/test',
+      newFileNames: ['Map_' + new Date().getTime()],
+      fileSuffixChoices: ['.json'],
+    }).then(async (files) => {
+      // 把地图数据写入目标文件中
+      NativeHTools?.writeFile(files[0], JSON.stringify(map)).then((res) => {
+        if (res) {
+          ToolRefs.getToast()?.show('地图已保存到：' + files[0], 3000)
+        } else {
+          ToolRefs.getToast()?.show('地图保存失败')
+        }
+      })
+    })
+  }
+
+  /**
    * 地图定位到当前位置
    */
   const flyToInitPosition = async () => {
@@ -110,6 +137,7 @@ export default function ThemeLayer(props: Props) {
 
     let theme: IThemeRange | IThemeLabelRange | IThemeUnique | IThemeLabelUnique | IThemeLabel | undefined = undefined
     let layerName = ''
+    // 根据类型创建专题图
     switch (type) {
       case 'range':
         theme = await webmap.theme.createRangeTheme({
@@ -118,6 +146,7 @@ export default function ThemeLayer(props: Props) {
           expression: '销售额（万元）',
           rangeMode: webmap.RangeMode.EQUALINTERVAL,
           rangeCount: 10,
+          colorScheme: webmap.ColorSchemeType.LA_Sky,
         })
         layerName = '分段专题图'
         if (theme && currentThemeLayer.current.theme) {
@@ -140,7 +169,7 @@ export default function ThemeLayer(props: Props) {
         theme = await webmap.theme.createLabelTheme({
           datasourceID: baseLayer.datasourceID,
           expression: '省名称',
-          textColor: '#FF0000',
+          textColor: DataUtil.randomColor(),
         })
         layerName = '统一标签专题图'
         if (theme && currentThemeLayer.current.label) {
@@ -164,9 +193,10 @@ export default function ThemeLayer(props: Props) {
         theme = await webmap.theme.createLabelRangeTheme({
           datasourceID: baseLayer.datasourceID,
           labelExpression: '省名称',
-          uniqueExpression: '销售额（万元）',
+          rangeExpression: '销售额（万元）',
           rangeMode: webmap.RangeMode.EQUALINTERVAL,
           rangeCount: 6,
+          colorScheme: webmap.ColorSchemeType.LA_Sky,
         })
         layerName = '分段标签专题图'
         if (theme && currentThemeLayer.current.label) {
@@ -185,8 +215,7 @@ export default function ThemeLayer(props: Props) {
       beforeLayerID = currentThemeLayer.current.label
     }
 
-    const layers = await webmap.layers.getLayers()
-
+    // 添加专题图
     const themeLayerID = await webmap.layers.add({
       type: 'theme',
       name: layerName,
@@ -228,13 +257,19 @@ export default function ThemeLayer(props: Props) {
           }}>
           <ImageButton
             style={styles.methodBtn}
-            image={getAssets().icon_import}
+            image={getAssets().icon_save}
+            title={'保存'}
+            onPress={save}
+          />
+          <ImageButton
+            style={styles.methodBtn}
+            image={getAssets().icon_theme}
             title={'单值'}
             onPress={() => createThemeLayer('unique')}
           />
           <ImageButton
             style={styles.methodBtn}
-            image={getAssets().icon_import}
+            image={getAssets().icon_theme}
             title={'分段'}
             onPress={() => createThemeLayer('range')}
           />

@@ -1,11 +1,11 @@
 /**
- * 对象编辑Demo
+ * 测量Demo
  * 
- * 包含点、线、面、文本对象的点编辑，移动，节点删除，新增节点
+ * 包含长度测量，面积测量，角度测量
  */
 import { Client, IGeoJSONFeature, ILicenseInfo, RTNWebMap } from '@mapplus/react-native-webmap'
 import { useEffect, useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { ImageButton, WebmapView } from '../../components'
 import BaseLayerData from '../../constants/BaseLayerData'
 import { DemoStackPageProps } from '../../navigators/types'
@@ -22,7 +22,7 @@ enum MeasureType {
 interface Props extends DemoStackPageProps<'Measure'> { }
 
 /**
- * 对象编辑
+ * 测量Demo
  * @param props 
  * @returns 
  */
@@ -283,18 +283,6 @@ export default function Measure(props: Props) {
         </View>
       )
   }
-
-  const renderTips = () => {
-    // if (!isEdit || selectData) return null
-    return (
-      <View style={styles.tipsView}>
-        <View style={styles.tips}>
-          <Text style={styles.tipsTxt}>请选择对象</Text>
-        </View>
-      </View>
-    )
-  }
-
   if (!license || !clientUrl) return null
 
   return (
@@ -303,7 +291,6 @@ export default function Measure(props: Props) {
       onInited={onLoad}
       navigation={props.navigation}
     >
-      {/* {renderTips()} */}
       {renderTools()}
       {renderTools2()}
     </WebmapView>
@@ -311,53 +298,6 @@ export default function Measure(props: Props) {
 }
 
 const styles = StyleSheet.create({
-  editBar: {
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: '#fff',
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    padding: 10,
-  },
-  rowView: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 60,
-    width: '100%',
-  },
-  rowTitle: {
-    fontSize: 14,
-    color: '#000',
-    width: 50,
-  },
-  rowContent: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 60,
-  },
-  input: {
-    flex: 1,
-    backgroundColor: '#efefef',
-    height: 40,
-    color: '#000',
-    borderRadius: 4,
-    textAlign: 'center',
-  },
-  imgBtn: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 4,
-    borderRadius: 4,
-    height: 40,
-    width: '25%',
-  },
-
   methodBtn: {
     display: 'flex',
     justifyContent: 'center',
@@ -368,28 +308,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginTop: 20
   },
-  methodBtnImg: {
-    height: 30,
-    width: 30,
-  },
-  tipsView: {
-    position: 'absolute',
-    top: 20,
-    left: 0,
-    height: 30,
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  tips: {
-    backgroundColor: '#rgba(0,0,0,0.3)',
-    padding: 8,
-    borderRadius: 5,
-    textAlign: 'center',
-  },
-  tipsTxt: {
-    color: '#fff',
-    fontSize: 14,
-  }
 });
