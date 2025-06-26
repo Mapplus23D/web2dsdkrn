@@ -71,10 +71,10 @@ const DemoList = ({ navigation }: Props) => {
           //   title: '对象属性',
           //   path: 'ObjectAttribute',
           // },
-          // {
-          //   title: '保存打开',
-          //   path: 'MapOpenSave',
-          // },
+          {
+            title: '保存打开',
+            path: 'MapOpenSave',
+          },
         ],
       },
     ];
