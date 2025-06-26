@@ -5,7 +5,7 @@
  * 
  * 文本样式只能单个对象修改
  */
-import { AddSourceParam, Client, IGeoJSONData, IGeoJSONFeature, IGeoJSONPoint, ILicenseInfo, RTNWebMap } from '@mapplus/react-native-webmap'
+import { AddSourceParam, Client, IGeoJSONData, IGeoJSONFeature, IGeoJSONPoint, ILicenseInfo, ISymbolFill, RTNWebMap } from '@mapplus/react-native-webmap'
 import { useEffect, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { getAssets } from '../../assets'
@@ -47,6 +47,17 @@ export default function LayerStyle(props: Props) {
     layerId: string,
   } | undefined>(undefined)
 
+
+  const symbolsRef = useRef<{
+    point: ISymbolFill[]
+    line: ISymbolFill[]
+    fill: ISymbolFill[]
+  }>({
+    point: [],
+    line: [],
+    fill: [],
+  })
+
   /** 激活许可 */
   const initLicense = () => {
     LicenseUtil.active().then(res => {
@@ -58,6 +69,23 @@ export default function LayerStyle(props: Props) {
     WebMapUtil.setClient(client);
     // 初始化图层
     initLayers()
+    const resources = await WebMapUtil.getDefaultResources()
+    console.log(resources)
+    if (resources.fill) {
+      for (const r of resources.fill) {
+        await client.symbolLibrary.addFillSymbol(r.name, r.url)
+      }
+    }
+    if (resources.line) {
+      for (const r of resources.line) {
+        await client.symbolLibrary.addLineSymbol(r.name, r.url)
+      }
+    }
+    if (resources.point) {
+      for (const r of resources.point) {
+        await client.symbolLibrary.addPointSymbol(r.name, r.url, 20, 20)
+      }
+    }
   }
 
   /**
@@ -392,7 +420,7 @@ export default function LayerStyle(props: Props) {
    * 修改图层样式
    * @returns 
    */
-  const changeStyle = () => {
+  const changeStyle = async () => {
     const client = WebMapUtil.getClient();
     if (!client) return;
 
@@ -417,6 +445,7 @@ export default function LayerStyle(props: Props) {
       })
     }
     if (pointLayerRef.current) {
+      const pointSymbols = await client.symbolLibrary.getPointSymbols()
       // 修改点样式
       client.layers.changeLayerStyle(pointLayerRef.current.layerId, {
         // 点颜色
@@ -442,6 +471,40 @@ export default function LayerStyle(props: Props) {
         textRotate: Math.random() * 360,
       })
       client.layers.refresh(textLayerRef.current.layerId)
+    }
+  }
+
+  /**
+   * 修改符号
+   * @returns 
+   */
+  const changeSymbol = async (clear?: boolean) => {
+    const client = WebMapUtil.getClient();
+    if (!client) return;
+
+    if (regionLayerRef.current) {
+      const fillSymbols = await client.symbolLibrary.getFillSymbols()
+      const lineSymbols = await client.symbolLibrary.getLineSymbols()
+      // 修改面符号
+      client.layers.changeLayerStyle(regionLayerRef.current.layerId, {
+        fillSymbol: clear ? '' : fillSymbols[DataUtil.getRandomIntInclusive(0, fillSymbols.length - 1)].id,
+        fillOutlineSymbol: clear ? '' : lineSymbols[DataUtil.getRandomIntInclusive(0, lineSymbols.length - 1)].id,
+      })
+    }
+    if (lineLayerRef.current) {
+      const symbols = await client.symbolLibrary.getLineSymbols()
+      // 修改线符号
+      client.layers.changeLayerStyle(lineLayerRef.current.layerId, {
+        lineWidth: 30,
+        lineSymbol: clear ? '' : symbols[DataUtil.getRandomIntInclusive(0, symbols.length - 1)].id,
+      })
+    }
+    if (pointLayerRef.current) {
+      const symbols = await client.symbolLibrary.getPointSymbols()
+      // 修改点符号
+      client.layers.changeLayerStyle(pointLayerRef.current.layerId, {
+        circleSymbol: clear ? '' : symbols[DataUtil.getRandomIntInclusive(0, symbols.length - 1)].id,
+      })
     }
   }
 
@@ -472,6 +535,16 @@ export default function LayerStyle(props: Props) {
             style={styles.methodBtn}
             image={getAssets().icon_style_black}
             onPress={changeStyle}
+          />
+          <ImageButton
+            style={styles.methodBtn}
+            image={getAssets().icon_symbol}
+            onPress={changeSymbol}
+          />
+          <ImageButton
+            style={styles.methodBtn}
+            image={getAssets().icon_close}
+            onPress={() => changeSymbol(true)}
           />
         </View>
       </View>

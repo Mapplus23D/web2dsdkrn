@@ -44,6 +44,7 @@ const icon_submit_black = require('./icon_submit_black.png')
 const icon_close = require('./icon_close.png')
 
 const icon_style_black = require('./icon_style_black.png')
+const icon_symbol = require('./icon_symbol.png')
 
 const images = {
   icon_back,
@@ -92,6 +93,7 @@ const images = {
   icon_close,
 
   icon_style_black,
+  icon_symbol,
 }
 
 function getAssets(theme?: string) {
