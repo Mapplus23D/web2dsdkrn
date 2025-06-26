@@ -558,6 +558,27 @@ export default function ObjectEdit(props: Props) {
     client.mapControl.setAction(client.Action.select)
   }
 
+  /** 删除对象 */
+  const deleteObj = async () => {
+    const client = WebMapUtil.getClient();
+    if (!client || !selectData) return;
+
+    const layer = await client.layers.getLayer(selectData.layerId)
+    // 只有矢量/文本/专题图层可以删除
+    if (layer && (layer.type === 'vector' || layer.type === 'text' || layer.type === 'theme')) {
+      // 删除对象
+      const result = await client.datasources.deleteObjects(layer.sourceId, [selectData.geometryId])
+      if (result) {
+        // 清空选择集，移除选中高亮
+        await client.layers.clearSelection(selectData.layerId)
+        // 刷新图层
+        await client.layers.refresh(selectData.layerId)
+        // 回到选择模式
+        cancel()
+      }
+    }
+  }
+
   /**
    * 图片按钮
    * @param image 
@@ -591,12 +612,13 @@ export default function ObjectEdit(props: Props) {
         <View style={styles.rowContent}>
           {renderImageBtn(getAssets().icon_editor, '编辑', startEdit)}
           {renderImageBtn(getAssets().icon_node_delete, '删除节点', deleteNode)}
+          {renderImageBtn(getAssets().icon_delete_black, '删除对象', deleteObj)}
+          {renderImageBtn(getAssets().icon_node_move, '平移', startMove, isMove)}
         </View>
 
-        <View style={styles.rowContent}>
-          {renderImageBtn(getAssets().icon_node_move, '平移', startMove, isMove)}
-          {renderImageBtn(getAssets().icon_submit_black, '提交', submit)}
+        <View style={[styles.rowContent, { justifyContent: 'space-between' }]}>
           {renderImageBtn(getAssets().icon_close, '取消', cancel)}
+          {renderImageBtn(getAssets().icon_submit_black, '提交', submit)}
         </View>
       </View>
     )

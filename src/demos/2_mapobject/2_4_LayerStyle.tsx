@@ -70,7 +70,6 @@ export default function LayerStyle(props: Props) {
     // 初始化图层
     initLayers()
     const resources = await WebMapUtil.getDefaultResources()
-    console.log(resources)
     if (resources.fill) {
       for (const r of resources.fill) {
         await client.symbolLibrary.addFillSymbol(r.name, r.url)
