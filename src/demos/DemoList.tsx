@@ -67,10 +67,10 @@ const DemoList = ({ navigation }: Props) => {
           //   title: '图层风格',
           //   path: 'LayerStyle',
           // },
-          // {
-          //   title: '对象属性',
-          //   path: 'ObjectAttribute',
-          // },
+          {
+            title: '对象属性',
+            path: 'ObjectAttribute',
+          },
           {
             title: '保存打开',
             path: 'MapOpenSave',

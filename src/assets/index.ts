@@ -4,6 +4,7 @@ const icon_loading = require('./icon_loading.png')
 const icon_delete_black = require('./icon_delete_black.png')
 const icon_save = require('./icon_save.png')
 const icon_doc = require('./icon_doc.png')
+const icon_add = require('./icon_add.png')
 
 //Layer
 const bg_base_4d = require('./baseLayer/bg_base_4d.png')
@@ -58,6 +59,7 @@ const images = {
   icon_delete_black,
   icon_save,
   icon_doc,
+  icon_add,
 
   // Layer
   bg_base_4d,
