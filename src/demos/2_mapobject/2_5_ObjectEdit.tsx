@@ -36,9 +36,6 @@ export default function ObjectEdit(props: Props) {
 
   const [selectData, setSelectData] = useState<SelectData>();
 
-  /** 准星图标句柄 用于获取屏幕坐标 */
-  const aimPointImageRef = useRef<Image>(null)
-
   const textLayerRef = useRef<{
     dsId: string,
     layerId: string,

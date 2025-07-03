@@ -1,5 +1,6 @@
-import { SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { DemoStackPageProps, DemoStackParamList } from 'src/navigators/types';
+import { getAssets } from '../assets';
 
 interface DemoItem {
   title: string;
@@ -36,7 +37,15 @@ const DemoList = ({ navigation }: Props) => {
         title: '底图覆盖物',
         data: [
           {
-            title: '几何图形',
+            title: '数据导入',
+            path: 'DataImport',
+          },
+          {
+            title: '保存打开',
+            path: 'MapOpenSave',
+          },
+          {
+            title: '对象绘制',
             path: 'DrawObject',
           },
           {
@@ -44,12 +53,12 @@ const DemoList = ({ navigation }: Props) => {
             path: 'DrawText',
           },
           {
-            title: '数据导入',
-            path: 'DataImport',
-          },
-          {
             title: '对象编辑',
             path: 'ObjectEdit',
+          },
+          {
+            title: '对象属性',
+            path: 'ObjectAttribute',
           },
           {
             title: '图层样式',
@@ -59,22 +68,18 @@ const DemoList = ({ navigation }: Props) => {
             title: '专题图',
             path: 'ThemeLayer',
           },
+        ],
+      },
+      {
+        title: '地图工具',
+        data: [
           {
             title: '测量',
             path: 'Measure',
           },
-          // {
           //   title: '图层风格',
           //   path: 'LayerStyle',
           // },
-          {
-            title: '对象属性',
-            path: 'ObjectAttribute',
-          },
-          {
-            title: '保存打开',
-            path: 'MapOpenSave',
-          },
         ],
       },
     ];
@@ -95,14 +100,31 @@ const DemoList = ({ navigation }: Props) => {
     </View>
   );
 
+  const renderHeader = () => {
+    return (
+      <View style={styles.headerView}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => navigation.goBack()}
+        >
+          <Image style={styles.backImg} source={getAssets().icon_back} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>SDK示例</Text>
+      </View>
+    )
+  }
+
   return (
-    <SectionList
-      sections={DATA}
-      keyExtractor={(item, index) => item.title + index}
-      renderItem={renderItem}
-      renderSectionHeader={renderSectionHeader}
-      contentContainerStyle={styles.container}
-    />
+    <View>
+      {renderHeader()}
+      <SectionList
+        sections={DATA}
+        keyExtractor={(item, index) => item.title + index}
+        renderItem={renderItem}
+        renderSectionHeader={renderSectionHeader}
+        contentContainerStyle={styles.container}
+      />
+    </View>
   );
 };
 
@@ -129,6 +151,31 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 14,
+  },
+  headerView: {
+    backgroundColor: '#fff',
+    height: 60,
+    display: 'flex',
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+  },
+  backBtn: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 40,
+    width: 40,
+  },
+  backImg: {
+    height: 24,
+    width: 24,
+  },
+  headerTitle: {
+    flex: 1,
+    fontSize: 20,
+    textAlign: 'center',
+    marginRight: 50,
   },
 });
 
