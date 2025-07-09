@@ -377,12 +377,12 @@ const imageData: BaseLayerItem[] = [
     action: addTianImage,
     prjType: 'wgs84',
   },
-  {
-    title: 'Bing影像',
-    image: getAssets().bg_base_minedata_img_layer,
-    action: addBing,
-    prjType: 'wgs84',
-  },
+  // {
+  //   title: 'Bing影像',
+  //   image: getAssets().bg_base_minedata_img_layer,
+  //   action: addBing,
+  //   prjType: 'wgs84',
+  // },
   {
     title: '腾讯影像',
     image: getAssets().bg_base_tx_image_layer,
