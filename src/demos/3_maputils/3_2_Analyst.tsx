@@ -1,7 +1,7 @@
 /**
- * 测量Demo
+ * 分析Demo
  * 
- * 包含长度测量，面积测量，角度测量
+ * 包含线重采样，线光滑，面相交，面合并，面擦除
  */
 import { AddLayerParam, Client, IClickEvent, IFillStyle, IGeoJSONFeature, IGeometryEvent, ILicenseInfo, ILineStyle, IPoint2D, RTNWebMap } from '@mapplus/react-native-webmap'
 import { useEffect, useRef, useState } from 'react'
@@ -41,7 +41,7 @@ interface SelectData { geometryId: number, layerId: string, sourceId: string }
 interface Props extends DemoStackPageProps<'Analyst'> { }
 
 /**
- * 测量Demo
+ * 分析Demo
  * @param props 
  * @returns 
  */
