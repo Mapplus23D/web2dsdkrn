@@ -19,6 +19,7 @@ export type DemoStackParamList = {
   MapOpenSave: undefined;
   ThemeLayer: undefined;
   Measure: undefined;
+  Analyst: undefined;
 };
 
 export type DemoStackNavigationProps<

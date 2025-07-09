@@ -77,9 +77,10 @@ const DemoList = ({ navigation }: Props) => {
             title: '测量',
             path: 'Measure',
           },
-          //   title: '图层风格',
-          //   path: 'LayerStyle',
-          // },
+          {
+            title: '数据分析',
+            path: 'Analyst',
+          },
         ],
       },
     ];
