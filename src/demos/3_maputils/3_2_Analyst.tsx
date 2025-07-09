@@ -145,23 +145,6 @@ export default function Analyst(props: Props) {
     }
   }, [license])
 
-  const setListener = (type?: 'select' | 'multiSelect') => {
-    switch (type) {
-      case 'select':
-        // removeMultiSelectListener()
-        addSelectListener()
-        break
-      case 'multiSelect':
-        // removeSelectListener()
-        // addMultiSelectListener()
-        break
-      default:
-        removeSelectListener()
-        // removeMultiSelectListener()
-        break
-    }
-  }
-
   /** 添加选择监听 */
   const addSelectListener = () => {
     const client = WebMapUtil.getClient();
@@ -176,22 +159,6 @@ export default function Analyst(props: Props) {
     if (!client) return;
     // 监听对象被选中事件
     client.removeListener('onSelect', selectHandler);
-  }
-
-  /** 添加选择监听 */
-  const addMultiSelectListener = () => {
-    const client = WebMapUtil.getClient();
-    if (!client) return;
-    // 监听对象被选中事件
-    client.addListener('onMultiSelect', multiSelectHandler);
-  }
-
-  /** 移除选择监听 */
-  const removeMultiSelectListener = () => {
-    const client = WebMapUtil.getClient();
-    if (!client) return;
-    // 监听对象被选中事件
-    client.removeListener('onMultiSelect', multiSelectHandler);
   }
 
   const selectHandler = async (data: {
