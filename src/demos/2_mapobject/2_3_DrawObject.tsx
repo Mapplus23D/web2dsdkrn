@@ -427,11 +427,6 @@ export default function DrawObject(props: Props) {
             image={getAssets().icon_region_black}
             onPress={() => setAction(drawType === DrawType.Region ? DrawType.Null : DrawType.Region)}
           />
-          <ImageButton
-            style={[styles.methodBtn, { backgroundColor: drawType === DrawType.Region ? '#4680DF' : '#fff' }]}
-            image={getAssets().icon_region_black}
-            onPress={() => setAction(drawType === DrawType.Region ? DrawType.Null : DrawType.Region)}
-          />
         </View>
       </View>
     )

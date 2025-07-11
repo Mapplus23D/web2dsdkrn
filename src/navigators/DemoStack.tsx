@@ -10,6 +10,7 @@ import LayerStyle from '../demos/2_mapobject/2_7_LayerStyle';
 import ThemeLayer from '../demos/2_mapobject/2_8_ThemeLayer';
 import Measure from '../demos/3_maputils/3_1_Measure';
 import Analyst from '../demos/3_maputils/3_2_Analyst';
+import MapCallout from '../demos/3_maputils/3_3_MapCallout';
 import DemoList from '../demos/DemoList';
 import Home from '../pages/Home';
 import { DemoStackParamList } from './types';
@@ -35,6 +36,7 @@ export default function DemoStack() {
       <Stack.Screen name="ObjectAttribute" component={ObjectAttribute} />
       <Stack.Screen name="MapOpenSave" component={MapOpenSave} />
       <Stack.Screen name="Analyst" component={Analyst} />
+      <Stack.Screen name="MapCallout" component={MapCallout} />
     </Stack.Navigator>
   );
 }

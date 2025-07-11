@@ -20,6 +20,7 @@ export type DemoStackParamList = {
   ThemeLayer: undefined;
   Measure: undefined;
   Analyst: undefined;
+  MapCallout: undefined;
 };
 
 export type DemoStackNavigationProps<

@@ -1,4 +1,5 @@
 import { RTNWebMap } from '@mapplus/react-native-webmap'
+import ToolRefs from './ToolRefs'
 
 export const active = async (code?: string) => {
   let license = await RTNWebMap?.getLicenseInfo()
@@ -14,6 +15,7 @@ export const active = async (code?: string) => {
   }
   if (!license?.isValid) {
     console.warn(license ? license.message : '没有获取到许可')
+    ToolRefs.getToast()?.show(license ? license.message : '没有获取到许可')
   }
   return license
 }

@@ -81,6 +81,10 @@ const DemoList = ({ navigation }: Props) => {
             title: '数据分析',
             path: 'Analyst',
           },
+          {
+            title: '地图标注',
+            path: 'MapCallout',
+          },
         ],
       },
     ];
@@ -124,6 +128,7 @@ const DemoList = ({ navigation }: Props) => {
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
         contentContainerStyle={styles.container}
+        style={{ height: '92%' }}
       />
     </View>
   );
