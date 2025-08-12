@@ -1,4 +1,5 @@
-import { Client, ISymbolLibrary, ISymbolPoint } from '@mapplus/react-native-webmap';
+import { Client } from '@mapplus/react-native-webmap';
+import { SymbolItem } from 'src/types/types';
 
 let client: Client | null = null;
 
@@ -27,9 +28,13 @@ export async function getDefaultResources() {
     },
     method: 'GET',
   })
-  const responseJson: ISymbolLibrary & {
-    point2d?: { [key: string]: ISymbolPoint[] }
+  const responseJson: {
+    point2d?: { [key: string]: SymbolItem[] }
+    point: SymbolItem[],
+    line: SymbolItem[],
+    fill: SymbolItem[],
   } = await response.json()
+  console.log(JSON.stringify(responseJson))
   return responseJson || {
     point2d: {},
     point: [],
