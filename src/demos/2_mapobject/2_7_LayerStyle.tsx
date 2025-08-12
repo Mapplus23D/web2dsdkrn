@@ -5,7 +5,7 @@
  * 
  * 文本样式只能单个对象修改
  */
-import { AddSourceParam, Client, IGeoJSONData, IGeoJSONFeature, IGeoJSONPoint, ILicenseInfo, RTNWebMap } from '@mapplus/react-native-webmap'
+import { AddSourceParam, Client, IGeoJSONData, IGeoJSONFeature, IGeoJSONPoint, ILicenseInfo, ISymbolFill, RTNWebMap } from '@mapplus/react-native-webmap'
 import { useEffect, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { getAssets } from '../../assets'
@@ -13,7 +13,6 @@ import { ImageButton, WebmapView } from '../../components'
 import BaseLayerData from '../../constants/BaseLayerData'
 import { DemoStackPageProps } from '../../navigators/types'
 import { DataUtil, LicenseUtil, MapUtil, WebMapUtil } from '../../utils'
-import { SymbolItem } from 'src/types/types'
 
 interface Props extends DemoStackPageProps<'LayerStyle'> { }
 
@@ -50,9 +49,9 @@ export default function LayerStyle(props: Props) {
 
 
   const symbolsRef = useRef<{
-    point: SymbolItem[]
-    line: SymbolItem[]
-    fill: SymbolItem[]
+    point: ISymbolFill[]
+    line: ISymbolFill[]
+    fill: ISymbolFill[]
   }>({
     point: [],
     line: [],
@@ -73,26 +72,17 @@ export default function LayerStyle(props: Props) {
     const resources = await WebMapUtil.getDefaultResources()
     if (resources.fill) {
       for (const r of resources.fill) {
-        await client.symbolLibrary.addFillSymbol(r.name, {
-          type: 'url',
-          url: r.url,
-        })
+        await client.symbolLibrary.addFillSymbol(r.name, r.url)
       }
     }
     if (resources.line) {
       for (const r of resources.line) {
-        await client.symbolLibrary.addLineSymbol(r.name, {
-          type: 'url',
-          url: r.url,
-        })
+        await client.symbolLibrary.addLineSymbol(r.name, r.url)
       }
     }
     if (resources.point) {
       for (const r of resources.point) {
-        await client.symbolLibrary.addPointSymbol(r.name, {
-          type: 'url',
-          url: r.url,
-        })
+        await client.symbolLibrary.addPointSymbol(r.name, r.url, 20, 20)
       }
     }
   }
