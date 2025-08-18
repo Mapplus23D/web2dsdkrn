@@ -534,16 +534,19 @@ export default function LayerStyle(props: Props) {
             style={styles.methodBtn}
             image={getAssets().icon_style_black}
             onPress={changeStyle}
+            title='样式'
           />
           <ImageButton
             style={styles.methodBtn}
             image={getAssets().icon_symbol}
             onPress={changeSymbol}
+            title='符号'
           />
           <ImageButton
             style={styles.methodBtn}
             image={getAssets().icon_close}
             onPress={() => changeSymbol(true)}
+            title='清除符号'
           />
         </View>
       </View>
