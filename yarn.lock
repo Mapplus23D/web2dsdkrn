@@ -1478,9 +1478,9 @@
   integrity sha512-sw/RMbehRhN68WRtcKCpQOPfnH6lLP4GJfqzi3iYej8tnzpZUDr6UkZYJjcjjC0FWEJOJbyM3PTIwxucUmDG2A==
 
 "@mapplus/react-native-webmap@file:../react-native-webmap/dist/react-native-webmap.tgz":
-  version "0.0.1"
+  version "0.0.4"
   resolved "file:../react-native-webmap/dist/react-native-webmap.tgz"
-  integrity sha512-z6aunxQot2cNr8CqQ6RGh4kB8t6hzaABOSnjEi8x0vum8/TpXY8vmDtRc4wLFuTYmYKc/oUDYcdMY8KU14muyQ==
+  integrity sha512-Q1vyVDzsuQXnJJ9sEykReOhLLXBelhZq42Vv77jxi2gEbvv9z8VyMTXTkXuBtg9td2J4qZYVb1i4yQ0ZSYK/CQ==
 
 "@nicolo-ribaudo/eslint-scope-5-internals@5.1.1-v1":
   version "5.1.1-v1"

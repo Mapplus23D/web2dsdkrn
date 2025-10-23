@@ -28,6 +28,8 @@ enum AnalystType {
   RESAMPLE,
   /** 线光滑*/
   SMOOTH,
+  /** 线夹角*/
+  LINEANGLE,
   /** 面相交 */
   POLYGON_INTERSECT,
   /** 面合并*/
@@ -84,6 +86,7 @@ export default function Analyst(props: Props) {
     // 坐标转换为地图坐标系
     const geo = await DataUtil.transGeoByCRS({
       type: "Feature",
+       properties:null,
       geometry: {
         type: "Point",
         coordinates: [104.09197291173261, 30.522202566573696],
@@ -431,7 +434,12 @@ export default function Analyst(props: Props) {
   }
 
   const _selectLine = async (type: AnalystType) => {
-    await setAction(DrawType.Select)
+    console.log(analystType)
+    if(analystType === AnalystType.LINEANGLE){
+      await setAction(DrawType.MultiSelect)
+    }else{
+      await setAction(DrawType.Select)
+    }
     setAnalystType(type)
   }
 
@@ -506,6 +514,20 @@ export default function Analyst(props: Props) {
       selectLine.current = undefined
     }
   }
+
+
+    const _lineAnge = async () => {
+    const client = WebMapUtil.getClient()
+    if (!client || analystType !== AnalystType.LINEANGLE) return
+    // 线夹角
+
+    const line1 = [[0, 0], [5, 0]];
+    const line2 = [[0, 0], [5, 6]];
+    const angle = await client.geometrist.measureLineAngle({type: "LineString",coordinates:line1}, {type: "LineString",coordinates:line2})
+    console.log('夹角',angle)
+  
+  }
+
 
   /** 面相交 */
   const _polygonIntersect = async () => {
@@ -640,6 +662,9 @@ export default function Analyst(props: Props) {
       case AnalystType.SMOOTH:
         _smooth()
         break
+      case AnalystType.LINEANGLE:
+        _lineAnge()
+        break
       case AnalystType.POLYGON_INTERSECT:
         _polygonIntersect()
         break
@@ -727,6 +752,11 @@ export default function Analyst(props: Props) {
             style={[styles.methodBtn, { backgroundColor: analystType === AnalystType.SMOOTH ? '#4680DF' : '#fff' }]}
             title='线光滑'
             onPress={() => _selectLine(AnalystType.SMOOTH)}
+          />
+          <ImageButton
+            style={[styles.methodBtn, { backgroundColor: analystType === AnalystType.LINEANGLE ? '#4680DF' : '#fff' }]}
+            title='线夹角计算'
+            onPress={() => _selectLine(AnalystType.LINEANGLE)}
           />
           <ImageButton
             style={[styles.methodBtn, { backgroundColor: analystType === AnalystType.POLYGON_INTERSECT ? '#4680DF' : '#fff' }]}

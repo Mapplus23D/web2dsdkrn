@@ -46,6 +46,7 @@ export default function MapCallout(props: Props) {
     // 坐标转换为地图坐标系
     const geo = await DataUtil.transGeoByCRS({
       type: "Feature",
+       properties:null,
       geometry: {
         type: "Point",
         coordinates: [104.09197291173261, 30.522202566573696],

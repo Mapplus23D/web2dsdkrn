@@ -57,6 +57,7 @@ export default function Measure(props: Props) {
     // 坐标转换为地图坐标系
     const geo = await DataUtil.transGeoByCRS({
       type: "Feature",
+       properties:null,
       geometry: {
         type: "Point",
         coordinates: [104.09197291173261, 30.522202566573696],
@@ -166,19 +167,47 @@ export default function Measure(props: Props) {
     client.mapControl.submit()
   }
 
-  const clear = () => {
+  /** 提交 */
+  const undo = () => {
+    const client = WebMapUtil.getClient();
+    if (!client) return;
+    client.mapControl.undo()
+  }
+
+  const cancle = () => {
     const client = WebMapUtil.getClient();
     if (!client) return;
     client.mapControl.trash()
   }
-
+  const clear = () => {
+    const client = WebMapUtil.getClient();
+    if (!client) return;
+    // client.mapControl.setAction(client.Action.select)
+    client.mapControl.clear()
+  }
+  const changeMeasureStyle = async () => {
+    const client = WebMapUtil.getClient();
+    if (!client) return;
+    // client.mapControl.setAction(client.Action.pan)
+    await client.mapControl.setMeasureTextShow(true)
+    await client.mapControl.setMeasureLengthShowAngle(true)
+    await client.mapControl.setMeasureAreaShowLength(true)
+    await client.mapControl.setStrokeColor('rgb(255,0,0)')
+    await client.mapControl.setStrokeFillColor('rgb(0,255,0)')
+    await client.mapControl.setStrokeWidth(4)
+    await client.mapControl.setNodeSize(8)
+    await client.mapControl.setNodeColor('rgb(0,0,255)')
+    await client.mapControl.setTextColor('rgb(0,255,255)')
+    await client.mapControl.setTextHaloColor('rgb(255,0,255)')
+    await client.mapControl.setTextHaloWidth(3)
+  }
   /** 距离量算 */
   const lengthMeasure = async () => {
     const client = WebMapUtil.getClient();
     if (!client) return;
     const currentAction = await client.mapControl.getAction()
     if (currentAction === client.Action.measure_length) {
-      client.mapControl.setAction(client.Action.pan)
+      client.mapControl.setAction(client.Action.select)
       setMeasureType(MeasureType.NULL)
     } else {
       client.mapControl.setAction(client.Action.measure_length)
@@ -232,6 +261,16 @@ export default function Measure(props: Props) {
         }}
       >
         <ImageButton
+          style={[styles.methodBtn]}
+          title={'风格设置'}
+          onPress={changeMeasureStyle}
+        />
+        <ImageButton
+          style={[styles.methodBtn]}
+          title={'清除'}
+          onPress={clear}
+        />
+        <ImageButton
           style={[styles.methodBtn, measureType === MeasureType.LENGTH && { backgroundColor: '#3499E5' }]}
           title={'距离'}
           onPress={lengthMeasure}
@@ -272,13 +311,18 @@ export default function Measure(props: Props) {
         >
           <ImageButton
             style={styles.methodBtn}
+            title={'撤销'}
+            onPress={undo}
+          />
+          <ImageButton
+            style={styles.methodBtn}
             title={'确定'}
             onPress={submit}
           />
           <ImageButton
             style={styles.methodBtn}
-            title={'清除'}
-            onPress={clear}
+            title={'取消'}
+            onPress={cancle}
           />
         </View>
       )

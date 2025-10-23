@@ -21,6 +21,7 @@ export type DemoStackParamList = {
   Measure: undefined;
   Analyst: undefined;
   MapCallout: undefined;
+  Navigation: undefined;
 };
 
 export type DemoStackNavigationProps<

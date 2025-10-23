@@ -7,7 +7,8 @@ import {
   RNOHErrorDialog,
   RNOHLogger,
   TraceJSBundleProviderDecorator,
-  RNOHCoreContext
+  RNOHCoreContext,
+  FileJSBundleProvider
 } from '@rnoh/react-native-openharmony';
 import { createRNPackages } from '../RNPackagesFactory';
 import { WebView, WEB_VIEW } from "@react-native-oh-tpl/react-native-webview"
@@ -75,7 +76,7 @@ struct Index {
           jsBundleProvider: new TraceJSBundleProviderDecorator(
             new AnyJSBundleProvider([
               new MetroJSBundleProvider(),
-              MetroJSBundleProvider.fromServerIp("10.10.7.181", 8081),
+              // MetroJSBundleProvider.fromServerIp("10.10.7.181", 8081),
               // NOTE: to load the bundle from file, place it in
               // `/data/app/el2/100/base/com.rnoh.tester/files/bundle.harmony.js`
               // on your device. The path mismatch is due to app sandboxing on OpenHarmony

@@ -45,7 +45,7 @@ export default function WebmapView(props: Props) {
           left: 10,
           width: 40,
           height: 40,
-          zIndex: 100,
+          // zIndex: 100,
           borderRadius: 4,
         }}
       />
@@ -76,6 +76,7 @@ export default function WebmapView(props: Props) {
         // 本地的web服务地址，包含实际的 sdk 代码引用
         source={{ uri: props.clientUrl }}
       />
+      
       {renderBackBtn()}
       {props.children}
     </View>

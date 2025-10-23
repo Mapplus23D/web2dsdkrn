@@ -9,6 +9,12 @@
             "request": "attach",
             "type": "reactnativedirect",
             "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Attach to Hermes application",
+            "request": "attach",
+            "type": "reactnativedirect",
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
