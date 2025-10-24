@@ -26,6 +26,7 @@ export default function Navigation(props: Props) {
   const [headingUp, setHeadingUp] = useState<boolean>(false)
   const [navPause, setNavPause] = useState<boolean>(false)
   const [navData ,setNavData] = useState<INavigationResultInfo | undefined>(undefined)
+  const [navSpeed, setNavSpeed] = useState<number>(1.0)
   // const [navStart, setNavStart] = useState<boolean>(false)
 
   /** 准星图标句柄 用于获取屏幕坐标 */
@@ -79,7 +80,7 @@ export default function Navigation(props: Props) {
     if (!client) return;
 
     // 添加默认底图
-    const dss = await BaseLayerData.image[0].action()
+    const dss = await BaseLayerData.image[3].action()
     for (const ds of dss) {
       ds && await client.baseLayers.add({
         sourceId: ds.id,
@@ -127,71 +128,71 @@ export default function Navigation(props: Props) {
     const start = navData.Rings[0].Points[0]
     const end = navData.Rings[0].Points[navData.Rings[0].Points.length - 1]
 
-    // //设置导航起点
-    // await client.navigation.setStartPos({longitude:start.X, latitude:start.Y})
-    // //设置导航终点
-    // await client.navigation.setEndPosPos({longitude:end.X, latitude:end.Y})
+    //设置导航起点
+    await client.navigation.setStartPos({longitude:start.X, latitude:start.Y})
+    //设置导航终点
+    await client.navigation.setEndPosPos({longitude:end.X, latitude:end.Y})
 
 
-    // const routes = navData.simples.Itmes
+    const routes = navData.simples.Itmes
    
-    // let navInfos:INavigationSubInfo[] = [] 
-    // for (let i = 0; i < routes.length; i++) {
+    let navInfos:INavigationSubInfo[] = [] 
+    for (let i = 0; i < routes.length; i++) {
 
-    //   const navInfo1: INavigationSubInfo = {
-    //     streeName: '',
-    //     routeCoordinates: []
-    //   }
-    //   const route = routes[i]
-    //   navInfo1.streeName = route.linkStreetName
+      const navInfo1: INavigationSubInfo = {
+        streeName: '',
+        routeCoordinates: []
+      }
+      const route = routes[i]
+      navInfo1.streeName = route.linkStreetName
 
-    //   const points = route.streetLatLon.split(';')
-    //   for(let pointstr of points){
-    //     const pointsPart = pointstr.split(',')
-    //     navInfo1.routeCoordinates.push({latitude:Number(pointsPart[1]),longitude:Number(pointsPart[0])})
-    //   }
-    //   navInfos.push(navInfo1)
-    // }
+      const points = route.streetLatLon.split(';')
+      for(let pointstr of points){
+        const pointsPart = pointstr.split(',')
+        navInfo1.routeCoordinates.push({latitude:Number(pointsPart[1]),longitude:Number(pointsPart[0])})
+      }
+      navInfos.push(navInfo1)
+    }
 
-    //   // 设置导航路径信息
-    // const b = await client.navigation.setRouteInfo({navigationSubInfo:navInfos})
+      // 设置导航路径信息
+    const b = await client.navigation.setRouteInfo({navigationSubInfo:navInfos})
 
 
         //设置导航起点
-    await client.navigation.setStartPos({longitude:116.404, latitude:39.915})
-    //设置导航终点
-    await client.navigation.setEndPosPos({longitude:116.418, latitude:39.924})
-    const navInfo1: INavigationSubInfo = {
-      streeName: '天府大道',
-      routeCoordinates: [
-        {longitude:116.404,latitude: 39.915},
-        {longitude:116.408,latitude: 39.918},
-      ]
-    }
-    const navInfo2: INavigationSubInfo = {
-      streeName: '科华南路',
-      routeCoordinates: [
-        {longitude:116.408,latitude: 39.918},
-        {longitude:116.412,latitude: 39.920},
-      ]
-    }
-     const navInfo3: INavigationSubInfo = {
-      streeName: '成华大道',
-      routeCoordinates: [
-        {longitude:116.412,latitude: 39.920},
-        {longitude:116.415,latitude: 39.922},
-      ]
-    }
-     const navInfo4: INavigationSubInfo = {
-      streeName: '麓山大道',
-      routeCoordinates: [
-        {longitude:116.415,latitude: 39.922},
-        {longitude:116.418,latitude: 39.924}
-      ]
-    }
+    // await client.navigation.setStartPos({longitude:116.404, latitude:39.915})
+    // //设置导航终点
+    // await client.navigation.setEndPosPos({longitude:116.418, latitude:39.924})
+    // const navInfo1: INavigationSubInfo = {
+    //   streeName: '天府大道',
+    //   routeCoordinates: [
+    //     {longitude:116.404,latitude: 39.915},
+    //     {longitude:116.408,latitude: 39.918},
+    //   ]
+    // }
+    // const navInfo2: INavigationSubInfo = {
+    //   streeName: '科华南路',
+    //   routeCoordinates: [
+    //     {longitude:116.408,latitude: 39.918},
+    //     {longitude:116.412,latitude: 39.920},
+    //   ]
+    // }
+    //  const navInfo3: INavigationSubInfo = {
+    //   streeName: '成华大道',
+    //   routeCoordinates: [
+    //     {longitude:116.412,latitude: 39.920},
+    //     {longitude:116.415,latitude: 39.922},
+    //   ]
+    // }
+    //  const navInfo4: INavigationSubInfo = {
+    //   streeName: '麓山大道',
+    //   routeCoordinates: [
+    //     {longitude:116.415,latitude: 39.922},
+    //     {longitude:116.418,latitude: 39.924}
+    //   ]
+    // }
 
-    // //设置导航路径信息
-    const b = await client.navigation.setRouteInfo({navigationSubInfo:[navInfo1,navInfo2,navInfo3,navInfo4]})
+    // // //设置导航路径信息
+    // const b = await client.navigation.setRouteInfo({navigationSubInfo:[navInfo1,navInfo2,navInfo3,navInfo4]})
     console.log('设置数据状态',b)
     //设置导航信息回调
      client.addListener('onNavgationInfoChange', (param)=>{
@@ -259,12 +260,28 @@ export default function Navigation(props: Props) {
    * 设置车头向上
    * @returns 
    */
-    const setHeadingUpFunc = async ()=>{
+  const setHeadingUpFunc = async ()=>{
     console.log('车头向上')
      const client = WebMapUtil.getClient();
     if (!client) return;
     setHeadingUp(!headingUp)
     await client.navigation.setHeadingUp(!headingUp)
+  }
+
+   /**
+   * 设置车头向上
+   * @returns 
+   */
+  const speedArr = [0.5,1.0,2.0,5.0,10.0]
+   const  indexRef = useRef(0)
+  const setNavSpeedFunc = async ()=>{
+    console.log('设置导航速度')
+     const client = WebMapUtil.getClient();
+    if (!client) return;
+    const s =  speedArr[indexRef.current++ % speedArr.length]
+    
+    setNavSpeed(s)
+    await client.navigation.setSpeed(s)
   }
   /**
    * 侧边工具栏
@@ -307,6 +324,11 @@ export default function Navigation(props: Props) {
           style={[styles.methodBtn]}
           title={headingUp === true ? '地图指北' : '车头向上'}
           onPress={setHeadingUpFunc}
+        />
+         <ImageButton
+          style={[styles.methodBtn]}
+          title={'速度:' + navSpeed + ''}
+          onPress={setNavSpeedFunc}
         />
       </View>
     )

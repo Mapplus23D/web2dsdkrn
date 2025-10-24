@@ -138,12 +138,12 @@ export default function NavigationComponent(props: NavigationComponentProps){
         }
 
         navDataTmp.totalTime =  '1分钟'
-        if(props.navdata.remainingTimeNextTurn > 60)
-          navDataTmp.totalTime = Math.round(props.navdata.remainingTimeNextTurn / 60) + '分钟'
+        if(props.navdata.remainingTime > 60)
+          navDataTmp.totalTime = Math.round(props.navdata.remainingTime / 60) + '分钟'
         
-        if (props.navdata.remainingTimeNextTurn > 3600) {
-          navDataTmp.totalTime = Math.round(props.navdata.remainingTimeNextTurn / 3600) + '小时' +
-            Math.round(props.navdata.remainingTimeNextTurn % 3600 / 60) + '分钟'
+        if (props.navdata.remainingTime > 3600) {
+          navDataTmp.totalTime = Math.round(props.navdata.remainingTime / 3600) + '小时' +
+            Math.round(props.navdata.remainingTime % 3600 / 60) + '分钟'
         }
         navDataTmp.progress = Math.round(props.navdata.progress * 100) + '%'
         navDataTmp.speed = Math.round(props.navdata.speed * 3.6) + ''
