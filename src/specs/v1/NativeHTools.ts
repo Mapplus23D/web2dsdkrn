@@ -129,6 +129,12 @@ export interface Spec extends TurboModule {
   copyDir(path: string, dest: string): Promise<boolean>
 
   unzipFile(inFile: string, outFile: string): Promise<boolean>
+
+  initTTS(): Promise<boolean>
+  
+  speak(text:string): Promise<void>
+
+  stopSpeak(): Promise<void>
 }
 
 export default TurboModuleRegistry.get<Spec>(

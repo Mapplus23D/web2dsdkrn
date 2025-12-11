@@ -11,6 +11,7 @@ import { DemoStackPageProps } from '../../navigators/types'
 import { DataUtil, LicenseUtil, WebMapUtil } from '../../utils'
 import NavigationComponent from '../../components/NavigationComponent'
 import { navDataTest } from './navData'
+import NativeHTools from '../../specs/v1/NativeHTools'
 
 interface Props extends DemoStackPageProps<'Navigation'> { }
 
@@ -158,7 +159,7 @@ export default function Navigation(props: Props) {
     const b = await client.navigation.setRouteInfo({navigationSubInfo:navInfos})
 
 
-        //设置导航起点
+    //     //设置导航起点
     // await client.navigation.setStartPos({longitude:116.404, latitude:39.915})
     // //设置导航终点
     // await client.navigation.setEndPosPos({longitude:116.418, latitude:39.924})
@@ -204,6 +205,14 @@ export default function Navigation(props: Props) {
       // }
       setNavData(param.navInfo)
         // console.log(param.navInfo)
+     })
+
+
+       NativeHTools?.initTTS()
+      client.addListener('onNavgationAudioMessageChange', (param)=>{
+        
+        console.log(param.message)
+        NativeHTools?.speak(param.message)
      })
     // await client.navigation.setNavigationInfoUpdateCallback((navState, info)=>{
     //   console.log(navState)
@@ -253,6 +262,7 @@ export default function Navigation(props: Props) {
     console.log('导航停止')
      const client = WebMapUtil.getClient();
     if (!client) return;
+    NativeHTools?.stopSpeak()
     await client.navigation.stop()
   }
 

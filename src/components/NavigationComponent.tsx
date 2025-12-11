@@ -43,6 +43,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',   // 垂直居中
     alignItems: 'center'
   },
+
+    curStreet: {
+    position: 'absolute',
+   
+   bottom: 50,
+    width: '100%',
+    height: 30,
+    flex: 1,
+    justifyContent: 'center',   // 垂直居中
+    alignItems: 'center'
+  },
   bottomBar: {
     position: 'absolute',
     bottom: 0,
@@ -73,6 +84,7 @@ const styles = StyleSheet.create({
 export default function NavigationComponent(props: NavigationComponentProps){
 
      type  NavData = {
+        curRoad:string,
         nextTurn: string,
         nextRoad: string,
         nextDistance: string,
@@ -91,7 +103,8 @@ export default function NavigationComponent(props: NavigationComponentProps){
         totalDistance: '3.8公里',
         totalTime: '10分钟',
         progress:'0%',
-        speed:'60km/h'
+        speed:'60km/h',
+        curRoad:''
     };
     const [navData ,setNavData] = useState<NavData | undefined>(navDataTmp)
     const [show ,setShow] = useState<boolean>(false)
@@ -147,6 +160,7 @@ export default function NavigationComponent(props: NavigationComponentProps){
         }
         navDataTmp.progress = Math.round(props.navdata.progress * 100) + '%'
         navDataTmp.speed = Math.round(props.navdata.speed * 3.6) + ''
+        navDataTmp.curRoad = props.navdata.curStreeName
         setNavData(navDataTmp)
        setShow(true)
       }else{
@@ -187,6 +201,27 @@ export default function NavigationComponent(props: NavigationComponentProps){
         }}>{'km/h'}</Text>
       </View>
 
+      <View style={styles.curStreet}>
+        <View style={
+          {
+            height:'100%',
+            width: 100,
+            borderRadius: 20, // 宽度和高度的一半
+            backgroundColor: '#1e88e5', // 可自定义背景色
+            flex: 1,
+            justifyContent: 'center',   // 垂直居中
+            alignItems: 'center'
+          }
+        }>
+          <Text style={{
+            fontSize: 16,
+            // fontWeight: 'bold',
+            color: '#ffffff'
+          }}>{navData.curRoad}</Text>
+        </View>
+     
+      
+      </View>
       <View style={styles.bottomBar}>
         <Text style={styles.summaryText}>
           全程剩余 {navData.totalDistance} · 约 {navData.totalTime} 后到达      进度:{navData.progress}
