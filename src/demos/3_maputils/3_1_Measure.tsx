@@ -96,7 +96,8 @@ export default function Measure(props: Props) {
   }
 
   const onMeasure = (event: {
-    measureResult: string;
+    value: number;
+    unit: string;
     isFinishied?: boolean;
   }) => {
     console.log(event)
@@ -105,7 +106,7 @@ export default function Measure(props: Props) {
       // window.removeEventListener('mousemove', updatePosition)
       return
     }
-    setMeasureValue(event.measureResult)
+    setMeasureValue(event.value+'')
     // window.addEventListener('mousemove', updatePosition)
   }
 

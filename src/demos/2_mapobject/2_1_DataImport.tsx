@@ -100,7 +100,10 @@ export default function DataImport(props: Props) {
       try {
         for (const file of files) {
           const dsName = file.substring(file.lastIndexOf('/') + 1, file.lastIndexOf('.'))
-          const content = await NativeHTools?.readFile(file)
+           const _path = decodeURI( file.split('file://docs')[1] )
+           console.log('_path', _path)
+          const content = await RNFS.readFile( _path)
+          // const content = await NativeHTools?.readFile(file)
           const geojson = content ? JSON.parse(content) : undefined
           geojson && await MapUtil.importGeojson(geojson, dsName)
         }
@@ -162,7 +165,10 @@ export default function DataImport(props: Props) {
       // 读取shp相关文件的base64内容，放到数组中
       for (const file of files) {
         const fileName = file.substring(file.lastIndexOf('/') + 1)
-        const content = await NativeHTools?.readFile(file, 'base64')
+        const _path = decodeURI(file.split('file://docs')[1])
+        console.log('_path', _path)
+        const content = await RNFS.readFile(_path, 'base64')
+        // const content = await NativeHTools?.readFile(file, 'base64')
 
         if (!dsName) {
           dsName = fileName.substring(0, fileName.lastIndexOf('.'))
@@ -232,7 +238,10 @@ export default function DataImport(props: Props) {
       // 读取shp相关文件的base64内容，放到数组中
       for (const file of _files) {
         const fileName = file.substring(file.lastIndexOf('/') + 1)
-        const content = await NativeHTools?.readFile(file, 'base64')
+        const _path = decodeURI(file.split('file://docs')[1])
+        console.log('_path', _path)
+        const content = await RNFS.readFile(_path, 'base64')
+        // const content = await NativeHTools?.readFile(file, 'base64')
 
         if (!dsName) {
           dsName = fileName.substring(0, fileName.lastIndexOf('.'))

@@ -1,4 +1,12 @@
-import { Client, ISymbolLibrary, ISymbolPoint } from '@mapplus/react-native-webmap';
+/*
+ * @Author: xiezhiyan 16297996+xiezhiyan@users.noreply.github.com
+ * @Date: 2025-08-12 14:34:31
+ * @LastEditors: xiezhiyan 16297996+xiezhiyan@users.noreply.github.com
+ * @LastEditTime: 2026-02-05 18:02:24
+ * @FilePath: /web2dsdkrn/src/utils/WebMapUtil.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
+import { Client, ISymbolItem, ISymbolLibrary } from '@mapplus/react-native-webmap';
 
 let client: Client | null = null;
 
@@ -28,7 +36,7 @@ export async function getDefaultResources() {
     method: 'GET',
   })
   const responseJson: ISymbolLibrary & {
-    point2d?: { [key: string]: ISymbolPoint[] }
+    point2d?: { [key: string]: ISymbolItem[] }
   } = await response.json()
   return responseJson || {
     point2d: {},

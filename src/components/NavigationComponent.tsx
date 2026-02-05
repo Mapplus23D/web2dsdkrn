@@ -177,7 +177,7 @@ export default function NavigationComponent(props: NavigationComponentProps){
   
 
     if(navData === undefined || show === false){
-        return
+        return <View></View>
     }
   return (
     <View style={styles.container}>

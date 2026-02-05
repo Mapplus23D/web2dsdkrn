@@ -14,7 +14,7 @@ export interface BaseLayerItem {
   title: string
   image: string
   prjType: Coordsys
-  action: () => Promise<(IGeoJSONDatasource | IRasterTileDatasource | null)[]>
+  action: () => Promise<(IGeoJSONDatasource | IRasterTileDatasource | any)[]>
 }
 
 let baseLayerToContext: ((data?: BaseLayerItem) => void) | undefined = undefined

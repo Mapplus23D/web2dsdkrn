@@ -169,7 +169,7 @@ export default function ThemeLayer(props: Props) {
         theme = await webmap.theme.createLabelTheme({
           datasourceID: baseLayer.datasourceID,
           expression: '省名称',
-          textColor: DataUtil.randomColor(),
+          defaultStyle: {textColor:DataUtil.randomColor()},
         })
         layerName = '统一标签专题图'
         if (theme && currentThemeLayer.current.label) {

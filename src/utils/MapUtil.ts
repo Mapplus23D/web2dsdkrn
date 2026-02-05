@@ -20,6 +20,7 @@ export const importDatasource = async (datasourceDatas: {
   if (datasourceDatas.length > 0) {
     for (let i = 0; i < datasourceDatas.length; i++) {
       const mapData: IGeoJSONDatasource = JSON.parse(datasourceDatas[i].content)
+      if(!mapData.data) continue
       const dsName = datasourceDatas[i].name
       const datas = await webmap.dataConverter.GeoJSONtoData(mapData.data)
 

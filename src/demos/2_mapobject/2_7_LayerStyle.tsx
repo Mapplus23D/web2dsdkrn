@@ -5,7 +5,7 @@
  * 
  * 文本样式只能单个对象修改
  */
-import { AddSourceParam, Client, IGeoJSONData, IGeoJSONFeature, IGeoJSONPoint, ILicenseInfo, ISymbolFill, RTNWebMap } from '@mapplus/react-native-webmap'
+import { AddSourceParam, Client, IGeoJSONData, IGeoJSONFeature, IGeoJSONPoint, ILicenseInfo, ISymbolItem, RTNWebMap } from '@mapplus/react-native-webmap'
 import { useEffect, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { getAssets } from '../../assets'
@@ -49,9 +49,9 @@ export default function LayerStyle(props: Props) {
 
 
   const symbolsRef = useRef<{
-    point: ISymbolFill[]
-    line: ISymbolFill[]
-    fill: ISymbolFill[]
+    point: ISymbolItem[]
+    line: ISymbolItem[]
+    fill: ISymbolItem[]
   }>({
     point: [],
     line: [],
@@ -72,17 +72,17 @@ export default function LayerStyle(props: Props) {
     const resources = await WebMapUtil.getDefaultResources()
     if (resources.fill) {
       for (const r of resources.fill) {
-        await client.symbolLibrary.addFillSymbol(r.name, r.url)
+        await client.symbolLibrary.addFillSymbol(r.name, r.resource)
       }
     }
     if (resources.line) {
       for (const r of resources.line) {
-        await client.symbolLibrary.addLineSymbol(r.name, r.url)
+        await client.symbolLibrary.addLineSymbol(r.name, r.resource)
       }
     }
     if (resources.point) {
       for (const r of resources.point) {
-        await client.symbolLibrary.addPointSymbol(r.name, r.url, 20, 20)
+        await client.symbolLibrary.addPointSymbol(r.name, r.resource)
       }
     }
   }
@@ -188,6 +188,7 @@ export default function LayerStyle(props: Props) {
     // 坐标转换为地图坐标系
     const geo = await transGeoByCRS({
       type: "Feature",
+      properties:null,
       geometry: {
         type: "Point",
         coordinates: [104.09197291173261, 30.522202566573696],
@@ -293,22 +294,26 @@ export default function LayerStyle(props: Props) {
       // 坐标转化为地图坐标
       const geo = await transGeoByCRS({
         type: "Feature",
+        properties:null,
         geometry: {
           type: "Point",
           coordinates: [104.09197291173261, 30.523202566973696],
         }
       }) as IGeoJSONFeature
       // 添加对象
-      const result = await client.datasources.addText(textLayerRef.current.dsId, {
+      const result = await client.recordset.addNew(textLayerRef.current.dsId, {
         /** 文本 */
-        value: '文本',
-        textSize: 20,
-        textColor: '#4680DF',
-        /** 文本位置 */
-        position: {
-          x: (geo.geometry as IGeoJSONPoint).coordinates[0],
-          y: (geo.geometry as IGeoJSONPoint).coordinates[1],
+        type: 'text',
+        text: '文本',
+        textStyle: {
+          textSize: 20,
+          textColor: '#4680DF'
         },
+        /** 文本位置 */
+        point: [
+          (geo.geometry as IGeoJSONPoint).coordinates[0],
+          (geo.geometry as IGeoJSONPoint).coordinates[1],
+        ],
       })
     }
   }
@@ -333,13 +338,14 @@ export default function LayerStyle(props: Props) {
       // 坐标转化为地图坐标
       const geo = await transGeoByCRS({
         type: "Feature",
+        properties:null,
         geometry: {
           type: "Point",
           coordinates: [104.09197291173261, 30.522202566573696],
         }
       }) as IGeoJSONFeature
       // 添加对象
-      const result = await client.datasources.addNew(pointLayerRef.current.dsId, geo)
+      const result = await client.recordset.addNew(pointLayerRef.current.dsId, geo.geometry)
     }
   }
 
@@ -363,6 +369,7 @@ export default function LayerStyle(props: Props) {
       // 坐标转化为地图坐标
       const geo = await transGeoByCRS({
         type: "Feature",
+        properties:null,
         geometry: {
           type: "LineString",
           coordinates: [
@@ -373,7 +380,7 @@ export default function LayerStyle(props: Props) {
         }
       }) as IGeoJSONFeature
       // 添加对象
-      const result = await client.datasources.addNew(lineLayerRef.current.dsId, geo)
+      const result = await client.recordset.addNew(lineLayerRef.current.dsId, geo.geometry)
     }
   }
 
@@ -396,6 +403,7 @@ export default function LayerStyle(props: Props) {
       // 坐标转化为地图坐标
       const geo = await transGeoByCRS({
         type: "Feature",
+        properties:null,
         geometry: {
           type: "Polygon",
           // 示例中使用的坐标为'wgs84'中的坐标
@@ -411,7 +419,7 @@ export default function LayerStyle(props: Props) {
         }
       }) as IGeoJSONFeature
       // 添加对象
-      const result = await client.datasources.addNew(regionLayerRef.current.dsId, geo)
+      const result = await client.recordset.addNew(regionLayerRef.current.dsId, geo.geometry)
     }
   }
 
