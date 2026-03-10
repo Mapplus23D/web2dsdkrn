@@ -16,11 +16,9 @@ import { ImageButton } from '../../components';
 import WebmapView from '../../components/WebmapView';
 import BaseLayerData from '../../constants/BaseLayerData';
 import { DemoStackPageProps } from '../../navigators/types';
-import NativeHTools from '../../specs/v1/NativeHTools';
 import {
   DataUtil,
   LicenseUtil,
-  ToolRefs,
   WebMapUtil,
 } from '../../utils';
 const exampleData = require('../../example/ThemeMap.json');
@@ -127,32 +125,6 @@ export default function ThemeLayer(props: Props) {
           type: 'image',
         }));
     }
-  };
-
-  /**
-   * 保存地图
-   * @returns
-   */
-  const save = async () => {
-    const client = WebMapUtil.getClient();
-    if (!client) return;
-    const map = await client.mapControl.getMap();
-    // 打开文件管理器，选择保存文件位置
-    NativeHTools?.openDocSave({
-      // 默认文件路径
-      defaultFilePathUri: 'file://docs/storage/Users/currentUser/test',
-      newFileNames: ['Map_' + new Date().getTime()],
-      fileSuffixChoices: ['.json'],
-    }).then(async files => {
-      // 把地图数据写入目标文件中
-      NativeHTools?.writeFile(files[0], JSON.stringify(map)).then(res => {
-        if (res) {
-          ToolRefs.getToast()?.show('地图已保存到：' + files[0], 3000);
-        } else {
-          ToolRefs.getToast()?.show('地图保存失败');
-        }
-      });
-    });
   };
 
   /**
@@ -305,12 +277,6 @@ export default function ThemeLayer(props: Props) {
             width: '30%',
             marginLeft: 10,
           }}>
-          <ImageButton
-            style={styles.methodBtn}
-            image={getAssets().icon_save}
-            title={'保存'}
-            onPress={save}
-          />
           <ImageButton
             style={styles.methodBtn}
             image={getAssets().icon_theme}

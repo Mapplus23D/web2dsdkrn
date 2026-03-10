@@ -5,7 +5,7 @@ import { AddSourceParam, Client, IClickEvent, IFieldInfo, IGeoJSONData, IGeoJSON
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { Image, ImageRequireSource, KeyboardAvoidingView, KeyboardTypeOptions, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { getAssets } from '../../assets'
-import { ImageButton, WebmapView } from '../../components'
+import { WebmapView } from '../../components'
 import { DemoStackPageProps } from '../../navigators/types'
 import { LicenseUtil, MapUtil, WebMapUtil } from '../../utils'
 
@@ -355,8 +355,8 @@ export default function ObjectAttribute(props: Props) {
 
     for (let i = 0; i < ds.fieldInfos.length; i++) {
       const _fieldInfo = ds.fieldInfos[i]
-      // 文本对象系统属性，直接跳过
-      if (_fieldInfo.name.startsWith('dtj')) continue
+      // 系统字段直接跳过
+      if (_fieldInfo.isSystem) continue
       // 获取属性字段的值
       const _value = await client.recordset.getFieldValue(
         layer.sourceId,
@@ -613,18 +613,6 @@ export default function ObjectAttribute(props: Props) {
     setSelectData(undefined)
   }
 
-  const closeMap = async () => {
-    const client = WebMapUtil.getClient();
-    if (!client || !selectData) return;
-    // 清空选择集
-    await client.layers.clearSelection(selectData.layerId)
-    // 刷新图层
-    await client.layers.refresh(selectData.layerId)
-    // 清空选中对象
-    setSelectData(undefined)
-    MapUtil.closeMap()
-  }
-
   const renderInputRow = (key: string, name: string, value: string, type: TFieldType) => {
     let keyboardType: KeyboardTypeOptions = 'default'
     switch (type) {
@@ -722,33 +710,6 @@ export default function ObjectAttribute(props: Props) {
           justifyContent: 'space-between',
         }}
       >
-        <View
-          style={{
-            width: '30%',
-            marginLeft: 10,
-          }}>
-          <ImageButton
-            style={styles.methodBtn}
-            title={'打开'}
-            image={getAssets().icon_doc}
-            onPress={async () => {
-              const result = await MapUtil.openMap()
-              result && initOptions()
-            }}
-          />
-          <ImageButton
-            style={styles.methodBtn}
-            title={'保存'}
-            image={getAssets().icon_save}
-            onPress={MapUtil.saveMap}
-          />
-          <ImageButton
-            style={styles.methodBtn}
-            title={'关闭'}
-            image={getAssets().icon_close}
-            onPress={closeMap}
-          />
-        </View>
       </View>
     )
   }
