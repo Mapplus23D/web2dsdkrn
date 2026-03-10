@@ -1,9 +1,12 @@
 package com.web2dsdkrn;
 
+import android.content.Intent;
+
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactActivityDelegate;
+import com.supermap.rnwebmap.WebMapResource;
 
 public class MainActivity extends ReactActivity {
 
@@ -29,4 +32,11 @@ public class MainActivity extends ReactActivity {
         // If you opted-in for the New Architecture, we enable the Fabric Renderer.
         DefaultNewArchitectureEntryPoint.getFabricEnabled());
   }
+
+  @Override
+  public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    WebMapResource.onActivityResult(requestCode, resultCode, data);
+  }
+
 }

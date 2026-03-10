@@ -91,7 +91,6 @@ export default function ThemeLayer(props: Props) {
       'example',
       exampleData,
     );
-    console.log('source', sources);
     if (sources.length === 1) {
       const source = sources[0];
       if (source.type !== 'geojson') return;

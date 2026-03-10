@@ -3,11 +3,13 @@ import {
   ExcelData,
   IDatasource,
   IFieldInfo,
+  IFileUri,
   ILicenseInfo,
   RTNWebMap,
 } from '@mapplus/react-native-webmap';
 import { useEffect, useState } from 'react';
 import {
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -116,8 +118,6 @@ export default function DataImport(props: Props) {
     const client = WebMapUtil.getClient();
     if (!client) return;
 
-    console.log('RTNWebMap', RTNWebMap);
-
     const res = await RTNWebMap.pickFileUri({ filter: ['json'] });
     if (res.length === 0) return;
 
@@ -165,8 +165,13 @@ export default function DataImport(props: Props) {
     const client = WebMapUtil.getClient();
     if (!client) return;
 
-    // todo android
-    const res = await RTNWebMap.pickFileUri({ filter: ['shp,dbf,prj,shx'] });
+    let res: IFileUri[] = []
+    if(Platform.OS === 'android') {
+      // android 至多只能指定一种类型文件，这里不指定特定类型
+      res = await RTNWebMap.pickFileUri(null);
+    } else {
+      res = await RTNWebMap.pickFileUri({ filter: ['shp,dbf,prj,shx'] });
+    }
     if (res.length === 0) return;
 
     ToolRefs.getLoading()?.setLoading(true, {
@@ -195,10 +200,7 @@ export default function DataImport(props: Props) {
       info: '正在导入数据...',
     });
 
-    console.log('import source');
-
     const sources = await client.datasources.createFromSHPFile(res[0].uri);
-    console.log('import source', sources);
     addLayerFromSources(sources);
 
     ToolRefs.getLoading()?.setLoading(false);
