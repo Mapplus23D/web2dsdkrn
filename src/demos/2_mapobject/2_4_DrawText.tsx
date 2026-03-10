@@ -156,11 +156,17 @@ export default function DrawText(props: Props) {
         y: pointY,
       })
       if (!tempPoint || !currentLayerInfo.current) return
-      const textID = await client.datasources.addText(currentLayerInfo.current.dsId, {
-        value: textRef.current,
-        position: tempPoint,
-        textColor: '#ffffff',
-        textSize: 30,
+     
+
+      const textID = await client.recordset.addNew(currentLayerInfo.current.dsId, {
+        type:'text',
+        text: textRef.current,
+        textStyle:{textSize: 30, textColor: '#ffffff'},
+        point: [
+                 tempPoint.x,
+                tempPoint.y,
+              ],
+       
       })
       textID !== undefined && textHistory.current.push(textID)
     })
@@ -172,7 +178,7 @@ export default function DrawText(props: Props) {
     if (!client || !currentLayerInfo.current) return
     const textID = textHistory.current.pop()
     if (textID === undefined) return
-    await client.datasources.deleteObjects(currentLayerInfo.current.dsId, [textID])
+    await client.recordset.delete(currentLayerInfo.current.dsId,{ids:[textID]} )
   }
 
   /** 准星 */

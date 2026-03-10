@@ -1,3 +1,11 @@
+/*
+ * @Author: xiezhiyan 16297996+xiezhiyan@users.noreply.github.com
+ * @Date: 2025-07-09 17:18:54
+ * @LastEditors: xiezhiyan 16297996+xiezhiyan@users.noreply.github.com
+ * @LastEditTime: 2025-10-09 14:20:27
+ * @FilePath: /web2dsdkrn/src/demos/DemoList.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { Image, SectionList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { DemoStackPageProps, DemoStackParamList } from 'src/navigators/types';
 import { getAssets } from '../assets';
@@ -82,8 +90,8 @@ const DemoList = ({ navigation }: Props) => {
             path: 'Analyst',
           },
           {
-            title: '地图标注',
-            path: 'MapCallout',
+            title: '地图导航',
+            path: 'Navigation',
           },
         ],
       },

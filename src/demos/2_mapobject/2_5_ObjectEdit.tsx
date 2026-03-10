@@ -176,6 +176,7 @@ export default function ObjectEdit(props: Props) {
     // 坐标转换为地图坐标系
     const geo = await transGeoByCRS({
       type: "Feature",
+      properties:null,
       geometry: {
         type: "Point",
         coordinates: [104.09197291173261, 30.522202566573696],
@@ -412,22 +413,23 @@ export default function ObjectEdit(props: Props) {
       // 坐标转化为地图坐标
       const geo = await transGeoByCRS({
         type: "Feature",
+        properties:null,
         geometry: {
           type: "Point",
           coordinates: [104.09197291173261, 30.523202566973696],
         }
       }) as IGeoJSONFeature
       // 添加对象
-      const result = await client.datasources.addText(textLayerRef.current.dsId, {
+      const result = await client.recordset.addNew(textLayerRef.current.dsId, {
         /** 文本 */
-        value: '文本',
-        textSize: 20,
-        textColor: '#4680DF',
+        text: '文本',
+        type:'text',
+        textStyle:{textSize: 20, textColor: '#4680DF'},
         /** 文本位置 */
-        position: {
-          x: (geo.geometry as IGeoJSONPoint).coordinates[0],
-          y: (geo.geometry as IGeoJSONPoint).coordinates[1],
-        },
+        point: [
+           (geo.geometry as IGeoJSONPoint).coordinates[0],
+           (geo.geometry as IGeoJSONPoint).coordinates[1],
+        ],
       })
     }
   }
@@ -452,13 +454,14 @@ export default function ObjectEdit(props: Props) {
       // 坐标转化为地图坐标
       const geo = await transGeoByCRS({
         type: "Feature",
+        properties:null,
         geometry: {
           type: "Point",
           coordinates: [104.09197291173261, 30.522202566573696],
         }
       }) as IGeoJSONFeature
       // 添加对象
-      const result = await client.datasources.addNew(pointLayerRef.current.dsId, geo)
+      const result = await client.recordset.addNew(pointLayerRef.current.dsId, geo.geometry)
     }
   }
 
@@ -482,6 +485,7 @@ export default function ObjectEdit(props: Props) {
       // 坐标转化为地图坐标
       const geo = await transGeoByCRS({
         type: "Feature",
+        properties:null,
         geometry: {
           type: "LineString",
           coordinates: [
@@ -492,7 +496,7 @@ export default function ObjectEdit(props: Props) {
         }
       }) as IGeoJSONFeature
       // 添加对象
-      const result = await client.datasources.addNew(lineLayerRef.current.dsId, geo)
+      const result = await client.recordset.addNew(lineLayerRef.current.dsId, geo.geometry)
     }
   }
 
@@ -515,8 +519,10 @@ export default function ObjectEdit(props: Props) {
       // 坐标转化为地图坐标
       const geo = await transGeoByCRS({
         type: "Feature",
+        properties:null,
         geometry: {
           type: "Polygon",
+          
           // 示例中使用的坐标为'wgs84'中的坐标
           coordinates: [
             [
@@ -530,7 +536,8 @@ export default function ObjectEdit(props: Props) {
         }
       }) as IGeoJSONFeature
       // 添加对象
-      const result = await client.datasources.addNew(regionLayerRef.current.dsId, geo)
+      
+      const result = await client.recordset.addNew(regionLayerRef.current.dsId, geo.geometry)
     }
   }
 
@@ -564,8 +571,9 @@ export default function ObjectEdit(props: Props) {
     // 只有矢量/文本/专题图层可以删除
     if (layer && (layer.type === 'vector' || layer.type === 'text' || layer.type === 'theme')) {
       // 删除对象
-      const result = await client.datasources.deleteObjects(layer.sourceId, [selectData.geometryId])
-      if (result) {
+      await client.recordset.delete(layer.sourceId, {ids:[selectData.geometryId]})
+      // if (result)
+         {
         // 清空选择集，移除选中高亮
         await client.layers.clearSelection(selectData.layerId)
         // 刷新图层

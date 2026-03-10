@@ -7,9 +7,10 @@ import { LoadingRefProps } from './components/Loading';
 import DemoStack from "./navigators/DemoStack";
 import { ToolRefs } from './utils';
 
-if (!__DEV__) {
-  LogBox.ignoreAllLogs();
-}
+// if (!__DEV__) {
+//   LogBox.ignoreAllLogs();
+// }
+LogBox.ignoreAllLogs();
 
 export default function App() {
 

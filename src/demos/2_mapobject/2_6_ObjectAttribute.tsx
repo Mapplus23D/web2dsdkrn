@@ -1,7 +1,7 @@
 /**
  * 属性编辑Demo
  */
-import { AddSourceParam, Client, IClickEvent, IFieldInfo, IGeoJSONData, IGeoJSONFeature, IGeoJSONPoint, IGeometryEvent, ILicenseInfo, RTNWebMap, TFieldType } from '@mapplus/react-native-webmap'
+import { AddSourceParam, Client, IClickEvent, IFieldInfo, IGeoJSONData, IGeoJSONFeature, IGeoJSONPoint, IGeometryEvent, ILicenseInfo, RTNWebMap, TFieldType, TFieldValueType } from '@mapplus/react-native-webmap'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { Image, ImageRequireSource, KeyboardAvoidingView, KeyboardTypeOptions, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { getAssets } from '../../assets'
@@ -228,6 +228,7 @@ export default function ObjectAttribute(props: Props) {
     // 坐标转换为地图坐标系
     const geo = await transGeoByCRS({
       type: "Feature",
+      properties:null,
       geometry: {
         type: "Point",
         coordinates: [104.09197291173261, 30.522202566573696],
@@ -357,15 +358,16 @@ export default function ObjectAttribute(props: Props) {
       // 文本对象系统属性，直接跳过
       if (_fieldInfo.name.startsWith('dtj')) continue
       // 获取属性字段的值
-      const _value = await client.datasources.getRecordsetFieldValue({
-        sourceId: layer.sourceId,
-        indexOrName: _fieldInfo.name,
-        geoId: selectData.geometryId,
-      })
+      const _value = await client.recordset.getFieldValue(
+        layer.sourceId,
+        selectData.geometryId,
+        _fieldInfo.name,
+        
+      )
 
       _fieldInfos.push({
         name: _fieldInfo.name,
-        value: _value,
+        value: _value?.value ,
         type: _fieldInfo.type,
       })
     }
@@ -409,22 +411,23 @@ export default function ObjectAttribute(props: Props) {
       // 坐标转化为地图坐标
       const geo = await transGeoByCRS({
         type: "Feature",
+        properties:null,
         geometry: {
           type: "Point",
           coordinates: [104.09197291173261, 30.523202566973696],
         }
       }) as IGeoJSONFeature
       // 添加对象
-      const result = await client.datasources.addText(textLayerRef.current.dsId, {
+       const result = await client.recordset.addNew(textLayerRef.current.dsId, {
         /** 文本 */
-        value: '文本',
-        textSize: 20,
-        textColor: '#4680DF',
+        text: '文本',
+        type:'text',
+        textStyle:{textSize: 20, textColor: '#4680DF'},
         /** 文本位置 */
-        position: {
-          x: (geo.geometry as IGeoJSONPoint).coordinates[0],
-          y: (geo.geometry as IGeoJSONPoint).coordinates[1],
-        },
+        point: [
+           (geo.geometry as IGeoJSONPoint).coordinates[0],
+           (geo.geometry as IGeoJSONPoint).coordinates[1],
+        ],
       })
     }
   }
@@ -449,13 +452,14 @@ export default function ObjectAttribute(props: Props) {
       // 坐标转化为地图坐标
       const geo = await transGeoByCRS({
         type: "Feature",
+        properties:null,
         geometry: {
           type: "Point",
           coordinates: [104.09197291173261, 30.522202566573696],
         }
       }) as IGeoJSONFeature
       // 添加对象
-      const result = await client.datasources.addNew(pointLayerRef.current.dsId, geo)
+      const result = await client.recordset.addNew(pointLayerRef.current.dsId, geo.geometry)
     }
   }
 
@@ -479,6 +483,7 @@ export default function ObjectAttribute(props: Props) {
       // 坐标转化为地图坐标
       const geo = await transGeoByCRS({
         type: "Feature",
+        properties:null,
         geometry: {
           type: "LineString",
           coordinates: [
@@ -489,7 +494,7 @@ export default function ObjectAttribute(props: Props) {
         }
       }) as IGeoJSONFeature
       // 添加对象
-      const result = await client.datasources.addNew(lineLayerRef.current.dsId, geo)
+      const result = await client.recordset.addNew(lineLayerRef.current.dsId, geo.geometry)
     }
   }
 
@@ -512,6 +517,7 @@ export default function ObjectAttribute(props: Props) {
       // 坐标转化为地图坐标
       const geo = await transGeoByCRS({
         type: "Feature",
+        properties:null,
         geometry: {
           type: "Polygon",
           // 示例中使用的坐标为'wgs84'中的坐标
@@ -527,7 +533,7 @@ export default function ObjectAttribute(props: Props) {
         }
       }) as IGeoJSONFeature
       // 添加对象
-      const result = await client.datasources.addNew(regionLayerRef.current.dsId, geo)
+      const result = await client.recordset.addNew(regionLayerRef.current.dsId, geo.geometry)
     }
   }
 
@@ -535,12 +541,12 @@ export default function ObjectAttribute(props: Props) {
     const client = WebMapUtil.getClient();
     if (!client || !selectData) return;
     // 更新选中对象的属性
-    client.datasources.setRecordsetFieldValue({
-      sourceId: selectData.sourceId,
-      indexOrName: key,
-      geoId: selectData.geometryId,
-      value: value,
-    })
+    client.recordset.setFieldValue(
+     selectData.sourceId,
+     selectData.geometryId,
+      key,
+      key === '数字' ? Number(value):value,
+    )
   }
 
   /**

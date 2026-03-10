@@ -1,3 +1,11 @@
+/*
+ * @Author: xiezhiyan 16297996+xiezhiyan@users.noreply.github.com
+ * @Date: 2025-08-18 16:01:08
+ * @LastEditors: xiezhiyan 16297996+xiezhiyan@users.noreply.github.com
+ * @LastEditTime: 2025-10-27 18:46:40
+ * @FilePath: /web2dsdkrn/src/components/WebmapView.tsx
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { Client, createRNClient } from "@mapplus/react-native-webmap"
 import React, { useMemo, useRef } from "react"
 import { View } from "react-native"
@@ -45,7 +53,7 @@ export default function WebmapView(props: Props) {
           left: 10,
           width: 40,
           height: 40,
-          zIndex: 100,
+          // zIndex: 100,
           borderRadius: 4,
         }}
       />
@@ -61,6 +69,7 @@ export default function WebmapView(props: Props) {
       <WebView
         ref={webViewRef}
         ignoreSilentHardwareSwitch={true}
+        mediaPlaybackRequiresUserAction = {false}
         onMessage={e => {
           // 处理来自 webview 中 webmap3d sdk 发来的消息
           client.handleMessage(e.nativeEvent.data)
@@ -73,9 +82,11 @@ export default function WebmapView(props: Props) {
           })
         }}
         webviewDebuggingEnabled={true}
+
         // 本地的web服务地址，包含实际的 sdk 代码引用
         source={{ uri: props.clientUrl }}
       />
+      
       {renderBackBtn()}
       {props.children}
     </View>

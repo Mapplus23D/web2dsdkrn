@@ -1,7 +1,7 @@
 /*
  * @Author: Yang Shang Long
  * @Date: 2024-02-20 14:03:40
- * @LastEditors: yangshanglong yangshanglong@supermap.com
+ * @LastEditors: xiezhiyan 16297996+xiezhiyan@users.noreply.github.com
  * @Description: 底图数据
  * 
  * Copyright (c) 2024 by SuperMap, All Rights Reserved. 
@@ -14,7 +14,7 @@ export interface BaseLayerItem {
   title: string
   image: string
   prjType: Coordsys
-  action: () => Promise<(IGeoJSONDatasource | IRasterTileDatasource | null)[]>
+  action: () => Promise<(IGeoJSONDatasource | IRasterTileDatasource | any)[]>
 }
 
 let baseLayerToContext: ((data?: BaseLayerItem) => void) | undefined = undefined
@@ -383,6 +383,12 @@ const imageData: BaseLayerItem[] = [
   //   action: addBing,
   //   prjType: 'wgs84',
   // },
+    {
+    title: '腾讯',
+    image: getAssets().bg_base_tx_image_layer,
+    action: addTX,
+    prjType: 'gcj02',
+  },
   {
     title: '腾讯影像',
     image: getAssets().bg_base_tx_image_layer,

@@ -46,6 +46,7 @@ export default function MapCallout(props: Props) {
     // 坐标转换为地图坐标系
     const geo = await DataUtil.transGeoByCRS({
       type: "Feature",
+       properties:null,
       geometry: {
         type: "Point",
         coordinates: [104.09197291173261, 30.522202566573696],
@@ -136,12 +137,12 @@ export default function MapCallout(props: Props) {
     const client = WebMapUtil.getClient()
     if (!client) return
     const llPoint = await getDrawPosition()
-    if (llPoint) {
-      client.mapControl.addCallout('tag_' + new Date().toTimeString(), {
-        location: llPoint,
-        html: `<div style="width: 100px; height:80px; background-color: #FFFF00">标注-${new Date()}</div>`,
-      })
-    }
+    // if (llPoint) {
+    //   client.mapControl.addCallout('tag_' + new Date().toTimeString(), {
+    //     location: llPoint,
+    //     html: `<div style="width: 100px; height:80px; background-color: #FFFF00">标注-${new Date()}</div>`,
+    //   })
+    // }
   }
 
   /** 画图中心点 */

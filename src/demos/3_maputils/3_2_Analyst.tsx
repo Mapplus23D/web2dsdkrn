@@ -3,14 +3,15 @@
  * 
  * 包含线重采样，线光滑，面相交，面合并，面擦除
  */
-import { AddLayerParam, Client, IClickEvent, IFillStyle, IGeoJSONFeature, IGeometryEvent, ILicenseInfo, ILineStyle, IPoint2D, RTNWebMap } from '@mapplus/react-native-webmap'
+import { AddLayerParam, Client, IClickEvent, IFillStyle, IGeoJSONFeature, IGeoJSONLine, IGeoJSONPolygon, IGeometryEvent, ILicenseInfo, ILineStyle, IPoint2D, RTNWebMap } from '@mapplus/react-native-webmap'
 import { useEffect, useRef, useState } from 'react'
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { getAssets } from '../../assets'
 import { ImageButton, WebmapView } from '../../components'
 import BaseLayerData from '../../constants/BaseLayerData'
 import { DemoStackPageProps } from '../../navigators/types'
 import { DataUtil, LicenseUtil, ToolRefs, WebMapUtil } from '../../utils'
+import Toast from 'react-native-easy-toast'
 
 /** 绘制类型 */
 enum DrawType {
@@ -28,6 +29,8 @@ enum AnalystType {
   RESAMPLE,
   /** 线光滑*/
   SMOOTH,
+  /** 线夹角*/
+  LINEANGLE,
   /** 面相交 */
   POLYGON_INTERSECT,
   /** 面合并*/
@@ -84,6 +87,7 @@ export default function Analyst(props: Props) {
     // 坐标转换为地图坐标系
     const geo = await DataUtil.transGeoByCRS({
       type: "Feature",
+       properties:null,
       geometry: {
         type: "Point",
         coordinates: [104.09197291173261, 30.522202566573696],
@@ -431,7 +435,12 @@ export default function Analyst(props: Props) {
   }
 
   const _selectLine = async (type: AnalystType) => {
-    await setAction(DrawType.Select)
+    console.log(analystType)
+    if(analystType === AnalystType.LINEANGLE){
+      await setAction(DrawType.MultiSelect)
+    }else{
+      await setAction(DrawType.Select)
+    }
     setAnalystType(type)
   }
 
@@ -451,18 +460,18 @@ export default function Analyst(props: Props) {
     }
 
     // 获取被修改对象
-    const geo = await client.datasources.getGeometry(selectLine.current.sourceId, selectLine.current.geometryId)
-    if (!geo || geo.geometry.type !== 'LineString') {
+    const geo = await client.recordset.toGeoJSON(selectLine.current.sourceId,false ,{ids:[selectLine.current.geometryId]})
+    if (!geo || geo.type !== 'Feature') {
       ToolRefs.getToast()?.show('请选择线对象')
       return
     }
     // 线重采样
-    const newGeo = await client.geometrist.resample(geo.geometry, 1)
+    const newGeo = await client.geometrist.resample((geo as IGeoJSONFeature).geometry as IGeoJSONLine, 1)
     if (!newGeo) return
     // 给新生成的对象赋予被修改对象id
     newGeo.id = selectLine.current.geometryId
     // 更新被修改的对象
-    const result = await client.datasources.setGeometry(selectLine.current.sourceId, newGeo)
+    const result = await client.recordset.setGeometry(selectLine.current.sourceId,selectLine.current.geometryId, newGeo.geometry)
     if (result) {
       // 清除选择集
       await client.layers.clearSelection(selectLine.current.layerId)
@@ -484,19 +493,20 @@ export default function Analyst(props: Props) {
     }
 
     // 获取被修改对象
-    const geo = await client.datasources.getGeometry(selectLine.current.sourceId, selectLine.current.geometryId)
-    if (!geo || geo.geometry.type !== 'LineString') {
+     const geo = await client.recordset.toGeoJSON(selectLine.current.sourceId,false ,{ids:[selectLine.current.geometryId]})
+    if (!geo || geo.type !== 'Feature') {
       ToolRefs.getToast()?.show('请选择线对象')
       return
     }
+
     // 线平滑
-    const newGeo = await client.geometrist.smooth(geo.geometry, 2)
+    const newGeo = await client.geometrist.smooth((geo as IGeoJSONFeature).geometry as IGeoJSONLine, 2)
 
     if (!newGeo) return
     // 给新生成的对象赋予被修改对象id
     newGeo.id = selectLine.current.geometryId
     // 更新被修改的对象
-    const result = await client.datasources.setGeometry(selectLine.current.sourceId, newGeo)
+    const result = await client.recordset.setGeometry(selectLine.current.sourceId,selectLine.current.geometryId, newGeo.geometry)
     if (result) {
       // 清除选择集
       await client.layers.clearSelection(selectLine.current.layerId)
@@ -506,6 +516,21 @@ export default function Analyst(props: Props) {
       selectLine.current = undefined
     }
   }
+
+
+    const _lineAnge = async () => {
+    const client = WebMapUtil.getClient()
+    if (!client || analystType !== AnalystType.LINEANGLE) return
+    // 线夹角
+
+    const line1 = [[0, 0], [5, 0]];
+    const line2 = [[0, 0], [5, 6]];
+    const angle = await client.geometrist.measureLineAngle({type: "LineString",coordinates:line1}, {type: "LineString",coordinates:line2})
+    Alert.alert(angle+'')
+    console.log('夹角',angle)
+  
+  }
+
 
   /** 面相交 */
   const _polygonIntersect = async () => {
@@ -518,28 +543,35 @@ export default function Analyst(props: Props) {
     }
 
     // 原面1
-    const geo = await client.datasources.getGeometry(selectRegions.current[0].sourceId, selectRegions.current[0].geometryId)
-    if (!geo || geo.geometry.type !== 'Polygon') {
-      ToolRefs.getToast()?.show('请选择面对象')
+     // 获取被修改对象
+     const geo = await client.recordset.toGeoJSON(selectRegions.current[0].sourceId,false ,{ids:[selectRegions.current[0].geometryId]})
+    if (!geo || geo.type !== 'Feature') {
+      ToolRefs.getToast()?.show('请选择线对象')
       return
     }
+
     // 原面2
-    const geo2 = await client.datasources.getGeometry(selectRegions.current[1].sourceId, selectRegions.current[1].geometryId)
-    if (!geo2 || geo2.geometry.type !== 'Polygon') {
-      ToolRefs.getToast()?.show('请选择面对象')
+     // 获取被修改对象
+     const geo2 = await client.recordset.toGeoJSON(selectRegions.current[1].sourceId,false ,{ids:[selectRegions.current[1].geometryId]})
+    if (!geo2 || geo2.type !== 'Feature') {
+      ToolRefs.getToast()?.show('请选择线对象')
       return
     }
-    // 面香蕉
-    const newGeo = await client.geometrist.polygonIntersect(geo.geometry, geo2.geometry)
+
+    // 面相交
+    const newGeo = await client.geometrist.polygonIntersect(
+      (geo as IGeoJSONFeature).geometry as IGeoJSONPolygon,
+      (geo2 as IGeoJSONFeature).geometry as IGeoJSONPolygon
+    )
 
     if (!newGeo) return
     // 给新生成的对象赋予被修改对象id
     newGeo.id = selectRegions.current[0].geometryId
     // 更新被修改的对象
-    const result = await client.datasources.setGeometry(selectRegions.current[0].sourceId, newGeo)
+    const result = await client.recordset.setGeometry(selectRegions.current[0].sourceId,selectRegions.current[0].geometryId,newGeo.geometry)
     if (result) {
       // 删除除修改的面其他的面
-      await client.datasources.deleteObjects(selectRegions.current[1].sourceId, [selectRegions.current[1].geometryId])
+      await client.recordset.delete(selectRegions.current[1].sourceId, {ids:[selectRegions.current[1].geometryId]})
       // 清除选择集
       await client.layers.clearSelection(selectRegions.current[0].layerId)
       // 刷新图层
@@ -558,30 +590,36 @@ export default function Analyst(props: Props) {
       ToolRefs.getToast()?.show('请选择2个面对象')
       return
     }
+    // 原面1
+     // 获取被修改对象
+     const geo = await client.recordset.toGeoJSON(selectRegions.current[0].sourceId,false ,{ids:[selectRegions.current[0].geometryId]})
+    if (!geo || geo.type !== 'Feature') {
+      ToolRefs.getToast()?.show('请选择线对象')
+      return
+    }
 
-    // 原面
-    const geo = await client.datasources.getGeometry(selectRegions.current[0].sourceId, selectRegions.current[0].geometryId)
-    if (!geo || geo.geometry.type !== 'Polygon') {
-      ToolRefs.getToast()?.show('请选择面对象')
+    // 原面2
+     // 获取被修改对象
+     const geo2 = await client.recordset.toGeoJSON(selectRegions.current[1].sourceId,false ,{ids:[selectRegions.current[1].geometryId]})
+    if (!geo2 || geo2.type !== 'Feature') {
+      ToolRefs.getToast()?.show('请选择线对象')
       return
     }
-    // 合并的面
-    const geo2 = await client.datasources.getGeometry(selectRegions.current[1].sourceId, selectRegions.current[1].geometryId)
-    if (!geo2 || geo2.geometry.type !== 'Polygon') {
-      ToolRefs.getToast()?.show('请选择面对象')
-      return
-    }
+
     /** 面合并 */
-    const newGeo = await client.geometrist.polygonUnion(geo.geometry, geo2.geometry)
+    const newGeo = await client.geometrist.polygonUnion(
+      (geo as IGeoJSONFeature).geometry as IGeoJSONPolygon,
+      (geo2 as IGeoJSONFeature).geometry as IGeoJSONPolygon
+    )
 
     if (!newGeo) return
     // 给新生成的对象赋予被修改对象id
     newGeo.id = selectRegions.current[0].geometryId
     // 更新被修改的对象
-    const result = await client.datasources.setGeometry(selectRegions.current[0].sourceId, newGeo)
+    const result = await client.recordset.setGeometry(selectRegions.current[0].sourceId,selectRegions.current[0].geometryId,newGeo.geometry)
     if (result) {
       // 删除除修改的面其他的面
-      await client.datasources.deleteObjects(selectRegions.current[1].sourceId, [selectRegions.current[1].geometryId])
+      await client.recordset.delete(selectRegions.current[1].sourceId, {ids:[selectRegions.current[1].geometryId]})
       // 清除选择集
       await client.layers.clearSelection(selectRegions.current[0].layerId)
       // 刷新图层
@@ -599,28 +637,45 @@ export default function Analyst(props: Props) {
       ToolRefs.getToast()?.show('请选择2个面对象')
       return
     }
-    // 原面
-    const geo = await client.datasources.getGeometry(selectRegions.current[0].sourceId, selectRegions.current[0].geometryId)
-    if (!geo || geo.geometry.type !== 'Polygon') {
-      ToolRefs.getToast()?.show('请选择面对象')
+   // 原面1
+     // 获取被修改对象
+     const geo = await client.recordset.toGeoJSON(selectRegions.current[0].sourceId,false ,{ids:[selectRegions.current[0].geometryId]})
+    if (!geo || geo.type !== 'Feature') {
+      ToolRefs.getToast()?.show('请选择线对象')
       return
     }
-    // 擦除面
-    const geo2 = await client.datasources.getGeometry(selectRegions.current[1].sourceId, selectRegions.current[1].geometryId)
-    if (!geo2 || geo2.geometry.type !== 'Polygon') {
-      ToolRefs.getToast()?.show('请选择面对象')
+
+    // 原面2
+     // 获取被修改对象
+     const geo2 = await client.recordset.toGeoJSON(selectRegions.current[1].sourceId,false ,{ids:[selectRegions.current[1].geometryId]})
+    if (!geo2 || geo2.type !== 'Feature') {
+      ToolRefs.getToast()?.show('请选择线对象')
       return
     }
-    const newGeo = await client.geometrist.polygonErase(geo2.geometry, geo.geometry)
+
+     // 面相交
+    const newGeo1 = await client.geometrist.polygonIntersect(
+      (geo as IGeoJSONFeature).geometry as IGeoJSONPolygon,
+      (geo2 as IGeoJSONFeature).geometry as IGeoJSONPolygon
+    )
+    if (!newGeo1) {
+      ToolRefs.getToast()?.show('不相交')
+      // console.log('不相交')
+      return
+    }
+    const newGeo = await client.geometrist.polygonErase(
+      (geo2 as IGeoJSONFeature).geometry as IGeoJSONPolygon,
+      (geo as IGeoJSONFeature).geometry as IGeoJSONPolygon,
+    )
 
     if (!newGeo) return
     // 给新生成的对象赋予被修改对象id
     newGeo.id = selectRegions.current[0].geometryId
     // 更新被修改的对象
-    const result = await client.datasources.setGeometry(selectRegions.current[0].sourceId, newGeo)
+    const result = await client.recordset.setGeometry(selectRegions.current[0].sourceId,selectRegions.current[0].geometryId,newGeo.geometry)
     if (result) {
       // 删除除修改的面其他的面
-      await client.datasources.deleteObjects(selectRegions.current[1].sourceId, [selectRegions.current[1].geometryId])
+      await client.recordset.delete(selectRegions.current[1].sourceId, {ids:[selectRegions.current[1].geometryId]})
       // 清除选择集
       await client.layers.clearSelection(selectRegions.current[0].layerId)
       // 刷新图层
@@ -639,6 +694,9 @@ export default function Analyst(props: Props) {
         break
       case AnalystType.SMOOTH:
         _smooth()
+        break
+      case AnalystType.LINEANGLE:
+        _lineAnge()
         break
       case AnalystType.POLYGON_INTERSECT:
         _polygonIntersect()
@@ -728,6 +786,11 @@ export default function Analyst(props: Props) {
             title='线光滑'
             onPress={() => _selectLine(AnalystType.SMOOTH)}
           />
+          {/* <ImageButton
+            style={[styles.methodBtn, { backgroundColor: analystType === AnalystType.LINEANGLE ? '#4680DF' : '#fff' }]}
+            title='线夹角计算'
+            onPress={() => _selectLine(AnalystType.LINEANGLE)}
+          /> */}
           <ImageButton
             style={[styles.methodBtn, { backgroundColor: analystType === AnalystType.POLYGON_INTERSECT ? '#4680DF' : '#fff' }]}
             title='面相交'

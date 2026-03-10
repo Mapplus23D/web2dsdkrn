@@ -7,7 +7,7 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "bundle:harmony": "react-native bundle-harmony --dev",
+    "bundle:harmony": "react-native bundle-harmony --dev false",
     "codegen": "react-native codegen-harmony --cpp-output-path ./harmony/entry/src/main/cpp/generated --rnoh-module-path ./harmony/entry/oh_modules/@rnoh/react-native-openharmony",
     "test": "jest",
     "prepare": "husky"
@@ -29,7 +29,7 @@
     ]
   },
   "dependencies": {
-    "@mapplus/react-native-webmap": "^0.0.4",
+    "@mapplus/react-native-webmap": "file:../react-native-webmap/dist/react-native-webmap.tgz",
     "@react-native-oh-tpl/react-native-safe-area-context": "^4.7.4-0.2.1",
     "@react-native-oh-tpl/react-native-webview": "^13.10.2-0.3.0",
     "@react-native-oh/react-native-harmony": "0.72.67",

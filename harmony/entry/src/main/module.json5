@@ -14,6 +14,14 @@
     "pages": "$profile:main_pages",
     "requestPermissions": [
       {
+        "name": "ohos.permission.MICROPHONE",
+        "reason": "$string:location_permission",
+        "usedScene": {
+          "abilities": ["EntryAbility"],
+          "when": "always"
+        }
+      },
+      {
         "name": "ohos.permission.ACCELEROMETER",
       }, {
         "name" : "ohos.permission.INTERNET"
