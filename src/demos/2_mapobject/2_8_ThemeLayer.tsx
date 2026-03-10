@@ -1,117 +1,160 @@
-import { IGeometryType, ILicenseInfo, IThemeLabel, IThemeLabelRange, IThemeLabelUnique, IThemeRange, IThemeUnique, RTNWebMap } from '@mapplus/react-native-webmap'
-import { useEffect, useRef, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
-import { getAssets } from '../../assets'
-import { ImageButton } from '../../components'
-import WebmapView from '../../components/WebmapView'
-import BaseLayerData from '../../constants/BaseLayerData'
-import { DemoStackPageProps } from '../../navigators/types'
-import NativeHTools from '../../specs/v1/NativeHTools'
-import { DataUtil, LicenseUtil, MapUtil, ToolRefs, WebMapUtil } from '../../utils'
-const exampleData = require('../../example/ThemeMap.json')
+import {
+  Client,
+  IGeometryType,
+  ILicenseInfo,
+  IThemeLabel,
+  IThemeLabelRange,
+  IThemeLabelUnique,
+  IThemeRange,
+  IThemeUnique,
+  RTNWebMap,
+} from '@mapplus/react-native-webmap';
+import { useEffect, useRef, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { getAssets } from '../../assets';
+import { ImageButton } from '../../components';
+import WebmapView from '../../components/WebmapView';
+import BaseLayerData from '../../constants/BaseLayerData';
+import { DemoStackPageProps } from '../../navigators/types';
+import NativeHTools from '../../specs/v1/NativeHTools';
+import {
+  DataUtil,
+  LicenseUtil,
+  ToolRefs,
+  WebMapUtil,
+} from '../../utils';
+const exampleData = require('../../example/ThemeMap.json');
 
-interface Props extends DemoStackPageProps<'ThemeLayer'> { }
+interface Props extends DemoStackPageProps<'ThemeLayer'> {}
 
-type MThemeLayerType = 'range' | 'unique' | 'label' | 'labelUnique' | 'labelRange'
+type MThemeLayerType =
+  | 'range'
+  | 'unique'
+  | 'label'
+  | 'labelUnique'
+  | 'labelRange';
 
 /**
  * 专题图Demo
  */
 export default function ThemeLayer(props: Props) {
-  const [license, setLicense] = useState<ILicenseInfo | undefined>()
-  const [clientUrl, setClientUrl] = useState<string | undefined>()
-  const [baseLayer, setBaseLayer] = useState<{
-    datasourceID: string,
-    geometryType: IGeometryType,
-    layerId: string,
-  } | undefined>()
+  const [license, setLicense] = useState<ILicenseInfo | undefined>();
+  const [clientUrl, setClientUrl] = useState<string | undefined>();
+  const [baseLayer, setBaseLayer] = useState<
+    | {
+        datasourceID: string;
+        geometryType: IGeometryType;
+      }
+    | undefined
+  >();
 
   const currentThemeLayer = useRef<{
-    label: string
-    theme: string
+    label: string;
+    theme: string;
   }>({
     label: '',
     theme: '',
-  })
+  });
 
   useEffect(() => {
     // 激活 sdk 许可
-    initLicense()
-  }, [])
+    initLicense();
+  }, []);
 
   useEffect(() => {
     // 激活sdk后，初始化
     if (license) {
       // 获取 sdk web 服务地址
-      const res = RTNWebMap?.getClientUrl()
+      const res = RTNWebMap.getClientUrl();
       if (res) {
-        setClientUrl(res)
+        setClientUrl(res);
       }
     }
     return () => {
       // 退出页面，关闭地图
-      WebMapUtil.getClient()?.mapControl.closeMap()
-      WebMapUtil.setClient(null)
-    }
-  }, [license])
+      WebMapUtil.getClient()?.mapControl.closeMap();
+      WebMapUtil.setClient(null);
+    };
+  }, [license]);
 
   /** 激活许可 */
   const initLicense = () => {
     LicenseUtil.active().then(res => {
-      setLicense(res)
-    })
-  }
+      setLicense(res);
+    });
+  };
 
-  const init = async () => {
-    flyToInitPosition()
-    await initLayers()
-    const result = await MapUtil.importGeojson(exampleData, 'example')
-    if (result && result.length > 0) {
-      setBaseLayer(result[0])
+  const init = async (client: Client) => {
+    flyToInitPosition();
+    await initLayers();
+    const sources = await client.datasources.createFromGeoJSON(
+      'example',
+      exampleData,
+    );
+    console.log('source', sources);
+    if (sources.length === 1) {
+      const source = sources[0];
+      if (source.type !== 'geojson') return;
+      client.layers.add({
+        name: 'layername',
+        type: 'vector',
+        geometryType: 'fill',
+        sourceId: source.id,
+        style: {
+          fillColor: '#0064ff44',
+          fillOutlineColor: '#0064FF',
+          fillOutlineWidth: 2,
+        },
+      });
+      setBaseLayer({
+        datasourceID: source.id,
+        geometryType: source.geometryType,
+      });
     }
-  }
+  };
 
   /** 初始化默认图层 */
   const initLayers = async () => {
-    const webmap = WebMapUtil.getClient()
-    if (!webmap) return
+    const webmap = WebMapUtil.getClient();
+    if (!webmap) return;
 
     // 添加默认底图
-    const dss = await BaseLayerData.image[0].action()
+    const dss = await BaseLayerData.image[0].action();
     for (const ds of dss) {
-      ds && await webmap.baseLayers.add({
-        sourceId: ds.id,
-        name: ds.name,
-        type: 'image'
-      })
+      ds &&
+        (await webmap.baseLayers.add({
+          sourceId: ds.id,
+          name: ds.name,
+          type: 'image',
+        }));
     }
-  }
+  };
 
   /**
    * 保存地图
-   * @returns 
+   * @returns
    */
   const save = async () => {
-    const client = WebMapUtil.getClient()
-    if (!client) return
-    const map = await client.mapControl.getMap()
+    const client = WebMapUtil.getClient();
+    if (!client) return;
+    const map = await client.mapControl.getMap();
     // 打开文件管理器，选择保存文件位置
     NativeHTools?.openDocSave({
       // 默认文件路径
       defaultFilePathUri: 'file://docs/storage/Users/currentUser/test',
       newFileNames: ['Map_' + new Date().getTime()],
       fileSuffixChoices: ['.json'],
-    }).then(async (files) => {
+    }).then(async files => {
       // 把地图数据写入目标文件中
-      NativeHTools?.writeFile(files[0], JSON.stringify(map)).then((res) => {
+      NativeHTools?.writeFile(files[0], JSON.stringify(map)).then(res => {
         if (res) {
-          ToolRefs.getToast()?.show('地图已保存到：' + files[0], 3000)
+          ToolRefs.getToast()?.show('地图已保存到：' + files[0], 3000);
         } else {
-          ToolRefs.getToast()?.show('地图保存失败')
+          ToolRefs.getToast()?.show('地图保存失败');
         }
-      })
-    })
-  }
+      });
+    });
+  };
 
   /**
    * 地图定位到当前位置
@@ -129,14 +172,20 @@ export default function ThemeLayer(props: Props) {
       duration: 1000,
       scale: 4.4911532365316153e-8,
     });
-  }
+  };
 
   const createThemeLayer = async (type: MThemeLayerType) => {
-    const webmap = WebMapUtil.getClient()
-    if (!webmap || !baseLayer) return
+    const webmap = WebMapUtil.getClient();
+    if (!webmap || !baseLayer) return;
 
-    let theme: IThemeRange | IThemeLabelRange | IThemeUnique | IThemeLabelUnique | IThemeLabel | undefined = undefined
-    let layerName = ''
+    let theme:
+      | IThemeRange
+      | IThemeLabelRange
+      | IThemeUnique
+      | IThemeLabelUnique
+      | IThemeLabel
+      | undefined = undefined;
+    let layerName = '';
     // 根据类型创建专题图
     switch (type) {
       case 'range':
@@ -147,46 +196,46 @@ export default function ThemeLayer(props: Props) {
           rangeMode: webmap.RangeMode.EQUALINTERVAL,
           rangeCount: 10,
           colorScheme: webmap.ColorSchemeType.LA_Sky,
-        })
-        layerName = '分段专题图'
+        });
+        layerName = '分段专题图';
         if (theme && currentThemeLayer.current.theme) {
           // 移除之前的专题图
-          await webmap.layers.remove(currentThemeLayer.current.theme)
+          await webmap.layers.remove(currentThemeLayer.current.theme);
         }
         break;
       case 'unique':
         theme = await webmap.theme.createUniqueTheme({
           datasourceID: baseLayer.datasourceID,
           expression: '订单数',
-        })
-        layerName = '单值专题图'
+        });
+        layerName = '单值专题图';
         if (theme && currentThemeLayer.current.theme) {
           // 移除之前的专题图
-          await webmap.layers.remove(currentThemeLayer.current.theme)
+          await webmap.layers.remove(currentThemeLayer.current.theme);
         }
         break;
       case 'label':
         theme = await webmap.theme.createLabelTheme({
           datasourceID: baseLayer.datasourceID,
           expression: '省名称',
-          defaultStyle: {textColor:DataUtil.randomColor()},
-        })
-        layerName = '统一标签专题图'
+          defaultStyle: { textColor: DataUtil.randomColor() },
+        });
+        layerName = '统一标签专题图';
         if (theme && currentThemeLayer.current.label) {
           // 移除之前的标签专题图
-          await webmap.layers.remove(currentThemeLayer.current.label)
+          await webmap.layers.remove(currentThemeLayer.current.label);
         }
         break;
       case 'labelUnique':
         theme = await webmap.theme.createLabelUniqueTheme({
           datasourceID: baseLayer.datasourceID,
           labelExpression: '省名称',
-          uniqueExpression: '订单数'
-        })
-        layerName = '单值标签专题图'
+          uniqueExpression: '订单数',
+        });
+        layerName = '单值标签专题图';
         if (theme && currentThemeLayer.current.label) {
           // 移除之前的标签专题图
-          await webmap.layers.remove(currentThemeLayer.current.label)
+          await webmap.layers.remove(currentThemeLayer.current.label);
         }
         break;
       case 'labelRange':
@@ -197,43 +246,46 @@ export default function ThemeLayer(props: Props) {
           rangeMode: webmap.RangeMode.EQUALINTERVAL,
           rangeCount: 6,
           colorScheme: webmap.ColorSchemeType.LA_Sky,
-        })
-        layerName = '分段标签专题图'
+        });
+        layerName = '分段标签专题图';
         if (theme && currentThemeLayer.current.label) {
           // 移除之前的标签专题图
-          await webmap.layers.remove(currentThemeLayer.current.label)
+          await webmap.layers.remove(currentThemeLayer.current.label);
         }
         break;
       default:
         break;
     }
-    if (!theme) return
+    if (!theme) return;
 
-    let beforeLayerID = ''
+    let beforeLayerID = '';
     if (!type.includes('label') && currentThemeLayer.current.label) {
       // 标签专题图，添加到标签图层上
-      beforeLayerID = currentThemeLayer.current.label
+      beforeLayerID = currentThemeLayer.current.label;
     }
 
     // 添加专题图
-    const themeLayerID = await webmap.layers.add({
-      type: 'theme',
-      name: layerName,
-      theme: theme as any,
-      geometryType: baseLayer.geometryType,
-      sourceId: baseLayer.datasourceID,
-    }, beforeLayerID)
+    const themeLayerID = await webmap.layers.add(
+      {
+        type: 'theme',
+        name: layerName,
+        theme: theme as any,
+        geometryType: baseLayer.geometryType,
+        sourceId: baseLayer.datasourceID,
+      },
+      beforeLayerID,
+    );
     if (themeLayerID) {
       if (type.includes('label')) {
         // 标签专题图
-        currentThemeLayer.current.label = themeLayerID
+        currentThemeLayer.current.label = themeLayerID;
       } else {
         // 普通专题图
-        currentThemeLayer.current.theme = themeLayerID
+        currentThemeLayer.current.theme = themeLayerID;
       }
     }
-    webmap.mapControl.refresh()
-  }
+    webmap.mapControl.refresh();
+  };
 
   /** 左侧工具栏 */
   const _renderTools = () => {
@@ -248,8 +300,7 @@ export default function ThemeLayer(props: Props) {
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'space-between',
-        }}
-      >
+        }}>
         <View
           style={{
             width: '30%',
@@ -293,23 +344,22 @@ export default function ThemeLayer(props: Props) {
           />
         </View>
       </View>
-    )
-  }
+    );
+  };
 
-  if (!license || !clientUrl) return null
+  if (!license || !clientUrl) return null;
 
   return (
     <WebmapView
       clientUrl={clientUrl}
       onInited={client => {
         WebMapUtil.setClient(client);
-        init()
+        init(client);
       }}
-      navigation={props.navigation}
-    >
+      navigation={props.navigation}>
       {_renderTools()}
     </WebmapView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -321,6 +371,6 @@ const styles = StyleSheet.create({
     width: 40,
     borderRadius: 4,
     backgroundColor: '#fff',
-    marginTop: 20
+    marginTop: 20,
   },
 });

@@ -64,7 +64,7 @@ export default function MapOpenSave(props: Props) {
   useEffect(() => {
     if (license) {
       // 获取 sdk web 服务地址
-      const res = RTNWebMap?.getClientUrl()
+      const res = RTNWebMap.getClientUrl()
       if (res) {
         setClientUrl(res)
       }

@@ -19,12 +19,6 @@
         "specPaths": [
           "./src/specs/v1"
         ]
-      },
-      {
-        "version": 2,
-        "specPaths": [
-          "./src/specs/v2"
-        ]
       }
     ]
   },

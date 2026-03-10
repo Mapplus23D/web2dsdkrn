@@ -58,7 +58,7 @@ export default function DrawObject(props: Props) {
     // 激活sdk后，初始化
     if (license) {
       // 获取 sdk web 服务地址
-      const res = RTNWebMap?.getClientUrl()
+      const res = RTNWebMap.getClientUrl()
       if (res) {
         setClientUrl(res)
       }
@@ -157,11 +157,7 @@ export default function DrawObject(props: Props) {
           /** 别名 */
           caption: '名称',
         },
-      ],
-      data: {
-        type: "FeatureCollection",
-        features: [],
-      }
+      ]
     })
     let layer = undefined
     // 添加图层
@@ -206,11 +202,7 @@ export default function DrawObject(props: Props) {
           /** 别名 */
           caption: '名称',
         },
-      ],
-      data: {
-        type: "FeatureCollection",
-        features: [],
-      }
+      ]
     })
     let layer = undefined
     // 添加图层
@@ -251,11 +243,7 @@ export default function DrawObject(props: Props) {
           /** 别名 */
           caption: '名称',
         },
-      ],
-      data: {
-        type: "FeatureCollection",
-        features: [],
-      }
+      ]
     })
     let layer = undefined
     // 添加图层

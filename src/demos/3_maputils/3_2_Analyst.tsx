@@ -142,7 +142,7 @@ export default function Analyst(props: Props) {
   useEffect(() => {
     if (license) {
       // 获取 sdk web 服务地址
-      const res = RTNWebMap?.getClientUrl()
+      const res = RTNWebMap.getClientUrl()
       if (res) {
         setClientUrl(res)
       }
@@ -310,10 +310,6 @@ export default function Analyst(props: Props) {
           caption: '名称',
         },
       ],
-      data: {
-        type: "FeatureCollection",
-        features: [],
-      }
     })
     let layer = undefined
     // 添加图层
@@ -355,10 +351,6 @@ export default function Analyst(props: Props) {
           caption: '名称',
         },
       ],
-      data: {
-        type: "FeatureCollection",
-        features: [],
-      }
     })
     let layer = undefined
     // 添加图层

@@ -16,7 +16,7 @@ export default function Home({ navigation }: Props) {
   /** 原生端进行初始化 */
   function init() {
     // 原生端通过指定端口号启动服务，并复制需要使用的资源
-    RTNWebMap?.initEnvironment(9988);
+    RTNWebMap.initEnvironment(9988);
   }
 
   /**
@@ -24,7 +24,7 @@ export default function Home({ navigation }: Props) {
    */
   async function getLicense() {
     // 获取当前许可状态
-    RTNWebMap?.getLicenseInfo().then(res => {
+    RTNWebMap.getLicenseInfo().then(res => {
       if (res) {
         setLicense(res);
       }
@@ -36,7 +36,7 @@ export default function Home({ navigation }: Props) {
   //   // 激活序列号，替换为有效的序列号
   //   const serial = 'XXV8W-2VZBM-WQNY7-VFQBV-7UDM2'
 
-  //   RTNWebMap?.activate(serial).then(res => {
+  //   RTNWebMap.activate(serial).then(res => {
   //     if (res) {
   //       console.log('激活成功')
   //       getLicense()

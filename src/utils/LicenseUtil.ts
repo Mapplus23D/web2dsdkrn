@@ -10,13 +10,13 @@ import { RTNWebMap } from '@mapplus/react-native-webmap'
 import ToolRefs from './ToolRefs'
 
 export const active = async (code?: string) => {
-  let license = await RTNWebMap?.getLicenseInfo()
+  let license = await RTNWebMap.getLicenseInfo()
   if (!license) {
     // 激活序列号，替换为有效的序列号
     const serial = code || 'MZQ34-E47KP-FQUFK-BB6P8-MM6F3'
-    const result = await RTNWebMap?.activate(serial)
+    const result = await RTNWebMap.activate(serial)
     if (result.success) {
-      license = await RTNWebMap?.getLicenseInfo()
+      license = await RTNWebMap.getLicenseInfo()
     } else {
       console.warn(result.message)
     }
@@ -29,5 +29,5 @@ export const active = async (code?: string) => {
 }
 
 export const getLicenseInfo = async () => {
-  return await RTNWebMap?.getLicenseInfo()
+  return await RTNWebMap.getLicenseInfo()
 }
