@@ -1,15 +1,20 @@
 /**
  * 测量Demo
- * 
+ *
  * 包含长度测量，面积测量，角度测量
  */
-import { Client, IGeoJSONFeature, ILicenseInfo, RTNWebMap } from '@mapplus/react-native-webmap'
-import { useEffect, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
-import { ImageButton, WebmapView } from '../../components'
-import BaseLayerData from '../../constants/BaseLayerData'
-import { DemoStackPageProps } from '../../navigators/types'
-import { DataUtil, LicenseUtil, WebMapUtil } from '../../utils'
+import {
+  Client,
+  IGeoJSONFeature,
+  ILicenseInfo,
+  RTNWebMap,
+} from '@mapplus/react-native-webmap';
+import { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { ImageButton, WebmapView } from '../../components';
+import BaseLayerData from '../../constants/BaseLayerData';
+import { DemoStackPageProps } from '../../navigators/types';
+import { DataUtil, LicenseUtil, WebMapUtil } from '../../utils';
 
 enum MeasureType {
   NULL,
@@ -18,34 +23,33 @@ enum MeasureType {
   ANGLE,
 }
 
-
-interface Props extends DemoStackPageProps<'Measure'> { }
+interface Props extends DemoStackPageProps<'Measure'> {}
 
 /**
  * 测量Demo
- * @param props 
- * @returns 
+ * @param props
+ * @returns
  */
 export default function Measure(props: Props) {
-  const [license, setLicense] = useState<ILicenseInfo | undefined>()
-  const [clientUrl, setClientUrl] = useState<string | undefined>()
+  const [license, setLicense] = useState<ILicenseInfo | undefined>();
+  const [clientUrl, setClientUrl] = useState<string | undefined>();
 
-  const [measureValue, setMeasureValue] = useState('')
-  const [measureType, setMeasureType] = useState<MeasureType>(MeasureType.NULL)
+  const [measureValue, setMeasureValue] = useState('');
+  const [measureType, setMeasureType] = useState<MeasureType>(MeasureType.NULL);
 
   /** 激活许可 */
   const initLicense = () => {
     LicenseUtil.active().then(res => {
-      setLicense(res)
-    })
-  }
+      setLicense(res);
+    });
+  };
 
   const onLoad = (client: Client) => {
     WebMapUtil.setClient(client);
     // 添加测量监听
-    addMeasureListener()
-    initLayers()
-  }
+    addMeasureListener();
+    initLayers();
+  };
 
   /**
    * 地图定位到当前位置
@@ -54,27 +58,17 @@ export default function Measure(props: Props) {
     const client = WebMapUtil.getClient();
     if (!client) return;
 
-    // 坐标转换为地图坐标系
-    const geo = await DataUtil.transGeoByCRS({
-      type: "Feature",
-       properties:null,
-      geometry: {
-        type: "Point",
-        coordinates: [104.09197291173261, 30.522202566573696],
-      }
-    }, 'wgs84', 'gcj02') as IGeoJSONFeature
-    if (!geo || !geo.geometry || geo.geometry.type !== 'Point') return;
     await client.mapControl.flyTo({
       center: {
         //经度
-        x: geo.geometry.coordinates[0],
+        x: 104.09197291173261,
         //维度
-        y: geo.geometry.coordinates[1],
+        y: 30.522202566573696,
       },
       duration: 1000,
       scale: 2.4911532365316153e-4,
     });
-  }
+  };
 
   /** 初始化默认图层 */
   const initLayers = async () => {
@@ -82,40 +76,41 @@ export default function Measure(props: Props) {
     if (!client) return;
 
     // 添加默认底图
-    const dss = await BaseLayerData.image[0].action()
+    const dss = await BaseLayerData.image[0].action();
     for (const ds of dss) {
-      ds && await client.baseLayers.add({
-        sourceId: ds.id,
-        name: ds.name,
-        type: 'image'
-      })
+      ds &&
+        (await client.baseLayers.add({
+          sourceId: ds.id,
+          name: ds.name,
+          type: 'image',
+        }));
     }
 
     // 定位到初始位置
-    flyToInitPosition()
-  }
+    flyToInitPosition();
+  };
 
   const onMeasure = (event: {
     value: number;
     unit: string;
     isFinishied?: boolean;
   }) => {
-    console.log(event)
+    console.log(event);
     if (event.isFinishied) {
-      setMeasureValue('')
+      setMeasureValue('');
       // window.removeEventListener('mousemove', updatePosition)
-      return
+      return;
     }
-    setMeasureValue(event.value+'')
+    setMeasureValue(event.value + '');
     // window.addEventListener('mousemove', updatePosition)
-  }
+  };
 
   /** 添加选择监听 */
   const addMeasureListener = () => {
     const client = WebMapUtil.getClient();
     if (!client) return;
     // 监听对象被选中事件
-    client.addListener('onMeasureResult', onMeasure)
+    client.addListener('onMeasureResult', onMeasure);
     client.mapControl.setSelectOption({
       /** 是否支持框选手势，默认false  */
       boxSelectEnable: false,
@@ -129,8 +124,8 @@ export default function Measure(props: Props) {
       featureDragEnable: false,
       /** 允许删除选中的可编辑对象，默认false */
       featureTrashEnable: false,
-    })
-  }
+    });
+  };
 
   /** 移除选择监听 */
   const removeMeasureListener = () => {
@@ -138,115 +133,115 @@ export default function Measure(props: Props) {
     if (!client) return;
     // 监听对象被选中事件
     client.removeListener('onMeasureResult', onMeasure);
-  }
+  };
 
   useEffect(() => {
     // 激活 sdk 许可
-    initLicense()
+    initLicense();
     return () => {
-      removeMeasureListener()
+      removeMeasureListener();
       // 退出页面，关闭地图
-      WebMapUtil.getClient()?.mapControl.closeMap()
-      WebMapUtil.setClient(null)
-    }
-  }, [])
+      WebMapUtil.getClient()?.mapControl.closeMap();
+      WebMapUtil.setClient(null);
+    };
+  }, []);
 
   useEffect(() => {
     if (license) {
       // 获取 sdk web 服务地址
-      const res = RTNWebMap.getClientUrl()
+      const res = RTNWebMap.getClientUrl();
       if (res) {
-        setClientUrl(res)
+        setClientUrl(res);
       }
     }
-  }, [license])
+  }, [license]);
 
   /** 提交 */
   const submit = () => {
     const client = WebMapUtil.getClient();
     if (!client) return;
-    client.mapControl.submit()
-  }
+    client.mapControl.submit();
+  };
 
   /** 提交 */
   const undo = () => {
     const client = WebMapUtil.getClient();
     if (!client) return;
-    client.mapControl.undo()
-  }
+    client.mapControl.undo();
+  };
 
   const cancle = () => {
     const client = WebMapUtil.getClient();
     if (!client) return;
-    client.mapControl.trash()
-  }
+    client.mapControl.trash();
+  };
   const clear = () => {
     const client = WebMapUtil.getClient();
     if (!client) return;
     // client.mapControl.setAction(client.Action.select)
-    client.mapControl.clear()
-  }
+    client.mapControl.clear();
+  };
   const changeMeasureStyle = async () => {
     const client = WebMapUtil.getClient();
     if (!client) return;
     // client.mapControl.setAction(client.Action.pan)
-    await client.mapControl.setMeasureTextShow(true)
-    await client.mapControl.setMeasureLengthShowAngle(true)
-    await client.mapControl.setMeasureAreaShowLength(true)
-    await client.mapControl.setStrokeColor('rgb(255,0,0)')
-    await client.mapControl.setStrokeFillColor('rgb(0,255,0)')
-    await client.mapControl.setStrokeWidth(4)
-    await client.mapControl.setNodeSize(8)
-    await client.mapControl.setNodeColor('rgb(0,0,255)')
-    await client.mapControl.setTextColor('rgb(0,255,255)')
-    await client.mapControl.setTextHaloColor('rgb(255,0,255)')
-    await client.mapControl.setTextHaloWidth(3)
-  }
+    await client.mapControl.setMeasureTextShow(true);
+    await client.mapControl.setMeasureLengthShowAngle(true);
+    await client.mapControl.setMeasureAreaShowLength(true);
+    await client.mapControl.setStrokeColor('rgb(255,0,0)');
+    await client.mapControl.setStrokeFillColor('rgb(0,255,0)');
+    await client.mapControl.setStrokeWidth(4);
+    await client.mapControl.setNodeSize(8);
+    await client.mapControl.setNodeColor('rgb(0,0,255)');
+    await client.mapControl.setTextColor('rgb(0,255,255)');
+    await client.mapControl.setTextHaloColor('rgb(255,0,255)');
+    await client.mapControl.setTextHaloWidth(3);
+  };
   /** 距离量算 */
   const lengthMeasure = async () => {
     const client = WebMapUtil.getClient();
     if (!client) return;
-    const currentAction = await client.mapControl.getAction()
+    const currentAction = await client.mapControl.getAction();
     if (currentAction === client.Action.measure_length) {
-      client.mapControl.setAction(client.Action.select)
-      setMeasureType(MeasureType.NULL)
+      client.mapControl.setAction(client.Action.select);
+      setMeasureType(MeasureType.NULL);
     } else {
-      client.mapControl.setAction(client.Action.measure_length)
-      setMeasureType(MeasureType.LENGTH)
+      client.mapControl.setAction(client.Action.measure_length);
+      setMeasureType(MeasureType.LENGTH);
     }
-  }
+  };
 
   /** 面积量算 */
   const areaMeasure = async () => {
     const client = WebMapUtil.getClient();
     if (!client) return;
-    const currentAction = await client.mapControl.getAction()
+    const currentAction = await client.mapControl.getAction();
     if (currentAction === client.Action.measure_area) {
-      client.mapControl.setAction(client.Action.pan)
-      setMeasureType(MeasureType.NULL)
+      client.mapControl.setAction(client.Action.pan);
+      setMeasureType(MeasureType.NULL);
     } else {
-      client.mapControl.setAction(client.Action.measure_area)
-      setMeasureType(MeasureType.AREA)
+      client.mapControl.setAction(client.Action.measure_area);
+      setMeasureType(MeasureType.AREA);
     }
-  }
+  };
 
   /** 角度量算 */
   const angleMeasure = async () => {
     const client = WebMapUtil.getClient();
     if (!client) return;
-    const currentAction = await client.mapControl.getAction()
+    const currentAction = await client.mapControl.getAction();
     if (currentAction === client.Action.measure_angle) {
-      client.mapControl.setAction(client.Action.pan)
-      setMeasureType(MeasureType.NULL)
+      client.mapControl.setAction(client.Action.pan);
+      setMeasureType(MeasureType.NULL);
     } else {
-      client.mapControl.setAction(client.Action.measure_angle)
-      setMeasureType(MeasureType.ANGLE)
+      client.mapControl.setAction(client.Action.measure_angle);
+      setMeasureType(MeasureType.ANGLE);
     }
-  }
+  };
 
   /**
    * 侧边工具栏
-   * @returns 
+   * @returns
    */
   const renderTools = () => {
     return (
@@ -259,8 +254,7 @@ export default function Measure(props: Props) {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-        }}
-      >
+        }}>
         <ImageButton
           style={[styles.methodBtn]}
           title={'风格设置'}
@@ -272,29 +266,38 @@ export default function Measure(props: Props) {
           onPress={clear}
         />
         <ImageButton
-          style={[styles.methodBtn, measureType === MeasureType.LENGTH && { backgroundColor: '#3499E5' }]}
+          style={[
+            styles.methodBtn,
+            measureType === MeasureType.LENGTH && {
+              backgroundColor: '#3499E5',
+            },
+          ]}
           title={'距离'}
           onPress={lengthMeasure}
         />
         <ImageButton
-          style={[styles.methodBtn, measureType === MeasureType.AREA && { backgroundColor: '#3499E5' }]}
+          style={[
+            styles.methodBtn,
+            measureType === MeasureType.AREA && { backgroundColor: '#3499E5' },
+          ]}
           title={'面积'}
           onPress={areaMeasure}
         />
         <ImageButton
-          style={[styles.methodBtn, measureType === MeasureType.ANGLE && { backgroundColor: '#3499E5' }]}
+          style={[
+            styles.methodBtn,
+            measureType === MeasureType.ANGLE && { backgroundColor: '#3499E5' },
+          ]}
           title={'角度'}
           onPress={angleMeasure}
         />
       </View>
-    )
-  }
-
-
+    );
+  };
 
   /**
    * 侧边工具栏
-   * @returns 
+   * @returns
    */
   const renderTools2 = () => {
     if (measureType !== MeasureType.NULL)
@@ -308,13 +311,8 @@ export default function Measure(props: Props) {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-          }}
-        >
-          <ImageButton
-            style={styles.methodBtn}
-            title={'撤销'}
-            onPress={undo}
-          />
+          }}>
+          <ImageButton style={styles.methodBtn} title={'撤销'} onPress={undo} />
           <ImageButton
             style={styles.methodBtn}
             title={'确定'}
@@ -326,20 +324,19 @@ export default function Measure(props: Props) {
             onPress={cancle}
           />
         </View>
-      )
-  }
-  if (!license || !clientUrl) return null
+      );
+  };
+  if (!license || !clientUrl) return null;
 
   return (
     <WebmapView
       clientUrl={clientUrl}
       onInited={onLoad}
-      navigation={props.navigation}
-    >
+      navigation={props.navigation}>
       {renderTools()}
       {renderTools2()}
     </WebmapView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -351,6 +348,6 @@ const styles = StyleSheet.create({
     width: 40,
     borderRadius: 4,
     backgroundColor: '#fff',
-    marginTop: 20
+    marginTop: 20,
   },
 });

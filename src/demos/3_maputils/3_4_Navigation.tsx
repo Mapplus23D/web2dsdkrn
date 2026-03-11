@@ -1,50 +1,59 @@
 /**
  * 标注Demo
  */
-import { Client, IGeoJSONFeature, ILicenseInfo, INavigationResultInfo, INavigationSubInfo, IPoint2D, RTNWebMap } from '@mapplus/react-native-webmap'
-import { useEffect, useRef, useState } from 'react'
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { getAssets } from '../../assets'
-import { ImageButton, WebmapView } from '../../components'
-import BaseLayerData from '../../constants/BaseLayerData'
-import { DemoStackPageProps } from '../../navigators/types'
-import { DataUtil, LicenseUtil, WebMapUtil } from '../../utils'
-import NavigationComponent from '../../components/NavigationComponent'
-import { navDataTest } from './navData'
-import NativeHTools from '../../specs/v1/NativeHTools'
+import {
+  Client,
+  IGeoJSONFeature,
+  ILicenseInfo,
+  INavigationResultInfo,
+  INavigationSubInfo,
+  IPoint2D,
+  RTNWebMap,
+} from '@mapplus/react-native-webmap';
+import { useEffect, useRef, useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { getAssets } from '../../assets';
+import { ImageButton, WebmapView } from '../../components';
+import BaseLayerData from '../../constants/BaseLayerData';
+import { DemoStackPageProps } from '../../navigators/types';
+import { DataUtil, LicenseUtil, WebMapUtil } from '../../utils';
+import NavigationComponent from '../../components/NavigationComponent';
+import { navDataTest } from './navData';
+import NativeHTools from '../../specs/v1/NativeHTools';
 
-interface Props extends DemoStackPageProps<'Navigation'> { }
+interface Props extends DemoStackPageProps<'Navigation'> {}
 
 /**
  * 标注Demo
- * @param props 
- * @returns 
+ * @param props
+ * @returns
  */
 export default function Navigation(props: Props) {
-  const [license, setLicense] = useState<ILicenseInfo | undefined>()
-  const [clientUrl, setClientUrl] = useState<string | undefined>()
+  const [license, setLicense] = useState<ILicenseInfo | undefined>();
+  const [clientUrl, setClientUrl] = useState<string | undefined>();
 
-  const [headingUp, setHeadingUp] = useState<boolean>(false)
-  const [navPause, setNavPause] = useState<boolean>(false)
-  const [navData ,setNavData] = useState<INavigationResultInfo | undefined>(undefined)
-  const [navSpeed, setNavSpeed] = useState<number>(1.0)
+  const [headingUp, setHeadingUp] = useState<boolean>(false);
+  const [navPause, setNavPause] = useState<boolean>(false);
+  const [navData, setNavData] = useState<INavigationResultInfo | undefined>(
+    undefined,
+  );
+  const [navSpeed, setNavSpeed] = useState<number>(1.0);
   // const [navStart, setNavStart] = useState<boolean>(false)
 
   /** 准星图标句柄 用于获取屏幕坐标 */
-  const aimPointImageRef = useRef<Image>(null)
-
+  const aimPointImageRef = useRef<Image>(null);
 
   /** 激活许可 */
   const initLicense = () => {
     LicenseUtil.active().then(res => {
-      setLicense(res)
-    })
-  }
+      setLicense(res);
+    });
+  };
 
   const onLoad = (client: Client) => {
     WebMapUtil.setClient(client);
-    initLayers()
-  }
+    initLayers();
+  };
 
   /**
    * 地图定位到当前位置
@@ -53,27 +62,17 @@ export default function Navigation(props: Props) {
     const client = WebMapUtil.getClient();
     if (!client) return;
 
-    // 坐标转换为地图坐标系
-    const geo = await DataUtil.transGeoByCRS({
-      type: "Feature",
-      properties:null,
-      geometry: {
-        type: "Point",
-        coordinates: [116.404, 39.915],
-      }
-    }, 'wgs84', 'gcj02') as IGeoJSONFeature
-    if (!geo || !geo.geometry || geo.geometry.type !== 'Point') return;
     await client.mapControl.flyTo({
       center: {
         //经度
-        x: geo.geometry.coordinates[0],
+        x: 104.09197291173261,
         //维度
-        y: geo.geometry.coordinates[1],
+        y: 30.522202566573696,
       },
       duration: 1000,
       scale: 2.4911532365316153e-4,
     });
-  }
+  };
 
   /** 初始化默认图层 */
   const initLayers = async () => {
@@ -81,83 +80,89 @@ export default function Navigation(props: Props) {
     if (!client) return;
 
     // 添加默认底图
-    const dss = await BaseLayerData.image[3].action()
+    const dss = await BaseLayerData.image[3].action();
     for (const ds of dss) {
-      ds && await client.baseLayers.add({
-        sourceId: ds.id,
-        name: ds.name,
-        type: 'image'
-      })
+      ds &&
+        (await client.baseLayers.add({
+          sourceId: ds.id,
+          name: ds.name,
+          type: 'image',
+        }));
     }
 
     // 定位到初始位置
-    flyToInitPosition()
-  }
+    flyToInitPosition();
+  };
   useEffect(() => {
     // 激活 sdk 许可
-    initLicense()
+    initLicense();
     return () => {
       // 退出页面，关闭地图
-      WebMapUtil.getClient()?.mapControl.closeMap()
-      WebMapUtil.setClient(null)
-    }
-  }, [])
+      WebMapUtil.getClient()?.mapControl.closeMap();
+      WebMapUtil.setClient(null);
+    };
+  }, []);
 
   useEffect(() => {
     if (license) {
       // 获取 sdk web 服务地址
-      const res = RTNWebMap.getClientUrl()
+      const res = RTNWebMap.getClientUrl();
       if (res) {
-        setClientUrl(res)
+        setClientUrl(res);
       }
     }
-  }, [license])
+  }, [license]);
 
-   /**
+  /**
    * 初始化导航
-   * @returns 
+   * @returns
    */
-  const initNav = async ()=>{
-    console.log('导航初始化')
+  const initNav = async () => {
+    console.log('导航初始化');
     const client = WebMapUtil.getClient();
     if (!client) return;
 
     //初始化导航实例，要在地图加载完成后
-    await client.navigation.initNavigation()
+    await client.navigation.initNavigation();
 
-    const navData = JSON.parse(navDataTest)
-    const start = navData.Rings[0].Points[0]
-    const end = navData.Rings[0].Points[navData.Rings[0].Points.length - 1]
+    const navData = JSON.parse(navDataTest);
+    const start = navData.Rings[0].Points[0];
+    const end = navData.Rings[0].Points[navData.Rings[0].Points.length - 1];
 
     //设置导航起点
-    await client.navigation.setStartPos({longitude:start.X, latitude:start.Y})
+    await client.navigation.setStartPos({
+      longitude: start.X,
+      latitude: start.Y,
+    });
     //设置导航终点
-    await client.navigation.setEndPosPos({longitude:end.X, latitude:end.Y})
+    await client.navigation.setEndPosPos({ longitude: end.X, latitude: end.Y });
 
+    const routes = navData.simples.Itmes;
 
-    const routes = navData.simples.Itmes
-   
-    let navInfos:INavigationSubInfo[] = [] 
+    let navInfos: INavigationSubInfo[] = [];
     for (let i = 0; i < routes.length; i++) {
-
       const navInfo1: INavigationSubInfo = {
         streeName: '',
-        routeCoordinates: []
-      }
-      const route = routes[i]
-      navInfo1.streeName = route.linkStreetName
+        routeCoordinates: [],
+      };
+      const route = routes[i];
+      navInfo1.streeName = route.linkStreetName;
 
-      const points = route.streetLatLon.split(';')
-      for(let pointstr of points){
-        const pointsPart = pointstr.split(',')
-        navInfo1.routeCoordinates.push({latitude:Number(pointsPart[1]),longitude:Number(pointsPart[0])})
+      const points = route.streetLatLon.split(';');
+      for (let pointstr of points) {
+        const pointsPart = pointstr.split(',');
+        navInfo1.routeCoordinates.push({
+          latitude: Number(pointsPart[1]),
+          longitude: Number(pointsPart[0]),
+        });
       }
-      navInfos.push(navInfo1)
+      navInfos.push(navInfo1);
     }
 
-      // 设置导航路径信息
-    const b = await client.navigation.setRouteInfo({navigationSubInfo:navInfos})
-
+    // 设置导航路径信息
+    const b = await client.navigation.setRouteInfo({
+      navigationSubInfo: navInfos,
+    });
 
     //     //设置导航起点
     // await client.navigation.setStartPos({longitude:116.404, latitude:39.915})
@@ -194,108 +199,101 @@ export default function Navigation(props: Props) {
 
     // // //设置导航路径信息
     // const b = await client.navigation.setRouteInfo({navigationSubInfo:[navInfo1,navInfo2,navInfo3,navInfo4]})
-    console.log('设置数据状态',b)
+    console.log('设置数据状态', b);
     //设置导航信息回调
-     client.addListener('onNavgationInfoChange', (param)=>{
+    client.addListener('onNavgationInfoChange', param => {
       // const res : INavigationResultInfo | undefined = navInfo.navInfo
       // console.log(param.navGuideState)
       // if(param.navGuideState === 'stop'){
       //   setNavData(undefined)
       //   return
       // }
-      setNavData(param.navInfo)
-        // console.log(param.navInfo)
-     })
+      setNavData(param.navInfo);
+      // console.log(param.navInfo)
+    });
 
-
-       NativeHTools?.initTTS()
-      client.addListener('onNavgationAudioMessageChange', (param)=>{
-        
-        console.log(param.message)
-        NativeHTools?.speak(param.message)
-     })
+    NativeHTools?.initTTS();
+    client.addListener('onNavgationAudioMessageChange', param => {
+      console.log(param.message);
+      NativeHTools?.speak(param.message);
+    });
     // await client.navigation.setNavigationInfoUpdateCallback((navState, info)=>{
     //   console.log(navState)
     //   console.log(info)
     // })
-  }
-
-
+  };
 
   /**
    * 设置导航路径
-   * @returns 
+   * @returns
    */
-  const navStart = async ()=>{
-    console.log('导航开始')
-     const client = WebMapUtil.getClient();
+  const navStart = async () => {
+    console.log('导航开始');
+    const client = WebMapUtil.getClient();
     if (!client) return;
-    await client.navigation.setSpeed(0.1)
-    await client.navigation.start('Simulated')
+    await client.navigation.setSpeed(0.1);
+    await client.navigation.start('Simulated');
+  };
 
-  }
-
-    /**
+  /**
    * 设置导航暂停&恢复
-   * @returns 
+   * @returns
    */
-  const navPauseFunc = async ()=>{
-    
-     const client = WebMapUtil.getClient();
+  const navPauseFunc = async () => {
+    const client = WebMapUtil.getClient();
     if (!client) return;
-    setNavPause(!navPause)
-    if(navPause){
-      console.log('导航恢复')
-      await client.navigation.resume()
-    }else{
-      console.log('导航暂停')
-      await client.navigation.pause()
+    setNavPause(!navPause);
+    if (navPause) {
+      console.log('导航恢复');
+      await client.navigation.resume();
+    } else {
+      console.log('导航暂停');
+      await client.navigation.pause();
     }
-    
-  }
+  };
 
-    /**
+  /**
    * 设置导航停止
-   * @returns 
+   * @returns
    */
-  const navEnd = async ()=>{
-    console.log('导航停止')
-     const client = WebMapUtil.getClient();
+  const navEnd = async () => {
+    console.log('导航停止');
+    const client = WebMapUtil.getClient();
     if (!client) return;
-    NativeHTools?.stopSpeak()
-    await client.navigation.stop()
-  }
+    NativeHTools?.stopSpeak();
+    await client.navigation.stop();
+  };
 
   /**
    * 设置车头向上
-   * @returns 
+   * @returns
    */
-  const setHeadingUpFunc = async ()=>{
-    console.log('车头向上')
-     const client = WebMapUtil.getClient();
+  const setHeadingUpFunc = async () => {
+    console.log('车头向上');
+    const client = WebMapUtil.getClient();
     if (!client) return;
-    setHeadingUp(!headingUp)
-    await client.navigation.setHeadingUp(!headingUp)
-  }
+    setHeadingUp(!headingUp);
+    await client.navigation.setHeadingUp(!headingUp);
+  };
 
-   /**
+  /**
    * 设置车头向上
-   * @returns 
+   * @returns
    */
-  const speedArr = [0.5,1.0,2.0,5.0,10.0]
-   const  indexRef = useRef(0)
-  const setNavSpeedFunc = async ()=>{
-    console.log('设置导航速度')
-     const client = WebMapUtil.getClient();
+  const speedArr = [0.5, 1.0, 2.0, 5.0, 10.0];
+  const indexRef = useRef(0);
+  const setNavSpeedFunc = async () => {
+    console.log('设置导航速度');
+    const client = WebMapUtil.getClient();
     if (!client) return;
-    const s =  speedArr[indexRef.current++ % speedArr.length]
-    
-    setNavSpeed(s)
-    await client.navigation.setSpeed(s)
-  }
+    const s = speedArr[indexRef.current++ % speedArr.length];
+
+    setNavSpeed(s);
+    await client.navigation.setSpeed(s);
+  };
   /**
    * 侧边工具栏
-   * @returns 
+   * @returns
    */
   const renderTools = () => {
     return (
@@ -308,8 +306,7 @@ export default function Navigation(props: Props) {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-        }}
-      >
+        }}>
         <ImageButton
           style={[styles.methodBtn]}
           title={'初始化导航'}
@@ -320,45 +317,41 @@ export default function Navigation(props: Props) {
           title={'导航开始'}
           onPress={navStart}
         />
-       <ImageButton
+        <ImageButton
           style={[styles.methodBtn]}
-          title={navPause === false ? '导航暂停': '导航恢复'}
+          title={navPause === false ? '导航暂停' : '导航恢复'}
           onPress={navPauseFunc}
         />
-         <ImageButton
+        <ImageButton
           style={[styles.methodBtn]}
           title={'导航停止'}
           onPress={navEnd}
         />
-         <ImageButton
+        <ImageButton
           style={[styles.methodBtn]}
           title={headingUp === true ? '地图指北' : '车头向上'}
           onPress={setHeadingUpFunc}
         />
-         <ImageButton
+        <ImageButton
           style={[styles.methodBtn]}
           title={'速度:' + navSpeed + ''}
           onPress={setNavSpeedFunc}
         />
       </View>
-    )
-  }
+    );
+  };
 
-
-  if (!license || !clientUrl) return null
+  if (!license || !clientUrl) return null;
 
   return (
     <WebmapView
       clientUrl={clientUrl}
       onInited={onLoad}
-      navigation={props.navigation}
-    >
+      navigation={props.navigation}>
       {renderTools()}
-      <NavigationComponent
-        navdata={navData}
-      />
+      <NavigationComponent navdata={navData} />
     </WebmapView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -383,7 +376,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     height: 40,
     width: 40,
-    backgroundColor: '#3499E5'
+    backgroundColor: '#3499E5',
   },
   bottomBtnText: {
     color: '#fff',
@@ -396,6 +389,6 @@ const styles = StyleSheet.create({
     width: 40,
     borderRadius: 4,
     backgroundColor: '#fff',
-    marginTop: 20
+    marginTop: 20,
   },
 });

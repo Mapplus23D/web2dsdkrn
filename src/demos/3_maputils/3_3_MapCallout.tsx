@@ -1,40 +1,46 @@
 /**
  * 标注Demo
  */
-import { Client, IGeoJSONFeature, ILicenseInfo, IPoint2D, RTNWebMap } from '@mapplus/react-native-webmap'
-import { useEffect, useRef, useState } from 'react'
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { getAssets } from '../../assets'
-import { WebmapView } from '../../components'
-import BaseLayerData from '../../constants/BaseLayerData'
-import { DemoStackPageProps } from '../../navigators/types'
-import { DataUtil, LicenseUtil, WebMapUtil } from '../../utils'
+import {
+  Client,
+  IGeoJSONFeature,
+  ILicenseInfo,
+  IPoint2D,
+  RTNWebMap,
+} from '@mapplus/react-native-webmap';
+import { useEffect, useRef, useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { getAssets } from '../../assets';
+import { WebmapView } from '../../components';
+import BaseLayerData from '../../constants/BaseLayerData';
+import { DemoStackPageProps } from '../../navigators/types';
+import { DataUtil, LicenseUtil, WebMapUtil } from '../../utils';
 
-interface Props extends DemoStackPageProps<'MapCallout'> { }
+interface Props extends DemoStackPageProps<'MapCallout'> {}
 
 /**
  * 标注Demo
- * @param props 
- * @returns 
+ * @param props
+ * @returns
  */
 export default function MapCallout(props: Props) {
-  const [license, setLicense] = useState<ILicenseInfo | undefined>()
-  const [clientUrl, setClientUrl] = useState<string | undefined>()
+  const [license, setLicense] = useState<ILicenseInfo | undefined>();
+  const [clientUrl, setClientUrl] = useState<string | undefined>();
 
   /** 准星图标句柄 用于获取屏幕坐标 */
-  const aimPointImageRef = useRef<Image>(null)
+  const aimPointImageRef = useRef<Image>(null);
 
   /** 激活许可 */
   const initLicense = () => {
     LicenseUtil.active().then(res => {
-      setLicense(res)
-    })
-  }
+      setLicense(res);
+    });
+  };
 
   const onLoad = (client: Client) => {
     WebMapUtil.setClient(client);
-    initLayers()
-  }
+    initLayers();
+  };
 
   /**
    * 地图定位到当前位置
@@ -42,28 +48,17 @@ export default function MapCallout(props: Props) {
   const flyToInitPosition = async () => {
     const client = WebMapUtil.getClient();
     if (!client) return;
-
-    // 坐标转换为地图坐标系
-    const geo = await DataUtil.transGeoByCRS({
-      type: "Feature",
-       properties:null,
-      geometry: {
-        type: "Point",
-        coordinates: [104.09197291173261, 30.522202566573696],
-      }
-    }, 'wgs84', 'gcj02') as IGeoJSONFeature
-    if (!geo || !geo.geometry || geo.geometry.type !== 'Point') return;
     await client.mapControl.flyTo({
       center: {
         //经度
-        x: geo.geometry.coordinates[0],
+        x: 104.09197291173261,
         //维度
-        y: geo.geometry.coordinates[1],
+        y: 30.522202566573696,
       },
       duration: 1000,
       scale: 2.4911532365316153e-4,
     });
-  }
+  };
 
   /** 初始化默认图层 */
   const initLayers = async () => {
@@ -71,79 +66,91 @@ export default function MapCallout(props: Props) {
     if (!client) return;
 
     // 添加默认底图
-    const dss = await BaseLayerData.image[0].action()
+    const dss = await BaseLayerData.image[0].action();
     for (const ds of dss) {
-      ds && await client.baseLayers.add({
-        sourceId: ds.id,
-        name: ds.name,
-        type: 'image'
-      })
+      ds &&
+        (await client.baseLayers.add({
+          sourceId: ds.id,
+          name: ds.name,
+          type: 'image',
+        }));
     }
 
     // 定位到初始位置
-    flyToInitPosition()
-  }
+    flyToInitPosition();
+  };
   useEffect(() => {
     // 激活 sdk 许可
-    initLicense()
+    initLicense();
     return () => {
       // 退出页面，关闭地图
-      WebMapUtil.getClient()?.mapControl.closeMap()
-      WebMapUtil.setClient(null)
-    }
-  }, [])
+      WebMapUtil.getClient()?.mapControl.closeMap();
+      WebMapUtil.setClient(null);
+    };
+  }, []);
 
   useEffect(() => {
     if (license) {
       // 获取 sdk web 服务地址
-      const res = RTNWebMap.getClientUrl()
+      const res = RTNWebMap.getClientUrl();
       if (res) {
-        setClientUrl(res)
+        setClientUrl(res);
       }
     }
-  }, [license])
+  }, [license]);
 
   /**
    * 获取屏幕坐标/地图坐标
    * @param transToMapLocation 是否转成地图坐标
-   * @returns 
+   * @returns
    */
-  const getDrawPosition = async (transToMapLocation = true): Promise<IPoint2D | null> => {
+  const getDrawPosition = async (
+    transToMapLocation = true,
+  ): Promise<IPoint2D | null> => {
     return new Promise(resolve => {
-      const client = WebMapUtil.getClient()
-      if (!client) return resolve(null)
-      aimPointImageRef.current?.measure(async (x: number, y: number, width: number, height: number, pageX: number, pageY: number) => {
-        const pointX = x + width / 2
-        const pointY = y + height / 2
-        if (transToMapLocation) {
-          // 屏幕坐标转为地理坐标
-          const tempPoint = await client.mapControl.pxToMap({
-            x: pointX,
-            y: pointY,
-          })
-          resolve(tempPoint)
-        } else {
-          resolve({
-            x: pointX,
-            y: pointY,
-          })
-        }
-      })
-    })
-  }
+      const client = WebMapUtil.getClient();
+      if (!client) return resolve(null);
+      aimPointImageRef.current?.measure(
+        async (
+          x: number,
+          y: number,
+          width: number,
+          height: number,
+          pageX: number,
+          pageY: number,
+        ) => {
+          const pointX = x + width / 2;
+          const pointY = y + height / 2;
+          if (transToMapLocation) {
+            // 屏幕坐标转为地理坐标
+            const tempPoint = await client.mapControl.pxToMap({
+              x: pointX,
+              y: pointY,
+            });
+            resolve(tempPoint);
+          } else {
+            resolve({
+              x: pointX,
+              y: pointY,
+            });
+          }
+        },
+      );
+    });
+  };
 
   /** 添加callout */
   const _addCallout = async () => {
-    const client = WebMapUtil.getClient()
-    if (!client) return
-    const llPoint = await getDrawPosition()
+    const client = WebMapUtil.getClient();
+    if (!client) return;
+    const llPoint = await getDrawPosition();
     // if (llPoint) {
     //   client.mapControl.addCallout('tag_' + new Date().toTimeString(), {
     //     location: llPoint,
     //     html: `<div style="width: 100px; height:80px; background-color: #FFFF00">标注-${new Date()}</div>`,
     //   })
     // }
-  }
+  };
 
   /** 画图中心点 */
   const _renderAim = () => {
@@ -159,8 +166,7 @@ export default function MapCallout(props: Props) {
           alignItems: 'center',
           backgroundColor: 'transparent',
         }}
-        pointerEvents={'none'}
-      >
+        pointerEvents={'none'}>
         <Image
           ref={aimPointImageRef}
           source={getAssets().icon_aim_point}
@@ -170,8 +176,8 @@ export default function MapCallout(props: Props) {
           }}
         />
       </View>
-    )
-  }
+    );
+  };
 
   /** 工具栏 */
   const _renderBar = () => {
@@ -181,21 +187,20 @@ export default function MapCallout(props: Props) {
           <Text style={[styles.bottomBtnText, { fontSize: 30 }]}>+</Text>
         </TouchableOpacity>
       </View>
-    )
-  }
+    );
+  };
 
-  if (!license || !clientUrl) return null
+  if (!license || !clientUrl) return null;
 
   return (
     <WebmapView
       clientUrl={clientUrl}
       onInited={onLoad}
-      navigation={props.navigation}
-    >
+      navigation={props.navigation}>
       {_renderAim()}
       {_renderBar()}
     </WebmapView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -220,7 +225,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     height: 40,
     width: 40,
-    backgroundColor: '#3499E5'
+    backgroundColor: '#3499E5',
   },
   bottomBtnText: {
     color: '#fff',
@@ -233,6 +238,6 @@ const styles = StyleSheet.create({
     width: 40,
     borderRadius: 4,
     backgroundColor: '#fff',
-    marginTop: 20
+    marginTop: 20,
   },
 });
