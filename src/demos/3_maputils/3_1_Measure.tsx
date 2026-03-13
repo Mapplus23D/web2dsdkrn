@@ -112,18 +112,12 @@ export default function Measure(props: Props) {
     // 监听对象被选中事件
     client.addListener('onMeasureResult', onMeasure);
     client.mapControl.setSelectOption({
-      /** 是否支持框选手势，默认false  */
       boxSelectEnable: false,
-      /** 累加选择，默认false  ps.按shift时强制进入累加选择模式*/
       accumulative: false,
-      /** 累加选择时是否通过框选取消选择状态，默认false  */
       boxUnselectWhenAccumulative: false,
-      /** 点击空白处取消选择，默认false  ps.单击鼠标右键强制取消选择 */
       cancleWhenClickNone: true,
-      /** 允许拖动选中的可编辑对象，默认false */
-      featureDragEnable: false,
-      /** 允许删除选中的可编辑对象，默认false */
-      featureTrashEnable: false,
+      editGeometryDraggable: false,
+      editGeometryDeletable: false,
     });
   };
 
@@ -173,7 +167,7 @@ export default function Measure(props: Props) {
   const cancle = () => {
     const client = WebMapUtil.getClient();
     if (!client) return;
-    client.mapControl.trash();
+    client.mapControl.deleteCurrentGeometry();
   };
   const clear = () => {
     const client = WebMapUtil.getClient();

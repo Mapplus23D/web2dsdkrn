@@ -1,4 +1,11 @@
-import { AddLayerParam, IFillStyle, ILicenseInfo, ILineStyle, IPointStyle, RTNWebMap } from '@mapplus/react-native-webmap';
+import {
+  AddLayerParam,
+  IFillStyle,
+  ILicenseInfo,
+  ILineStyle,
+  IPointStyle,
+  RTNWebMap,
+} from '@mapplus/react-native-webmap';
 import { useEffect, useRef, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getAssets } from '../../assets';
@@ -8,7 +15,7 @@ import BaseLayerData from '../../constants/BaseLayerData';
 import { DemoStackPageProps } from '../../navigators/types';
 import { LicenseUtil, WebMapUtil } from '../../utils';
 
-interface Props extends DemoStackPageProps<'DrawObject'> { }
+interface Props extends DemoStackPageProps<'DrawObject'> {}
 
 /** 绘制类型 */
 enum DrawType {
@@ -22,89 +29,87 @@ enum DrawType {
 }
 /**
  * 几何图形绘制Demo
- * 
+ *
  * 准星和手绘打点，绘制点、线、面对象
  */
 export default function DrawObject(props: Props) {
+  const pointLayerID = useRef<string>();
+  const lineLayerID = useRef<string>();
+  const regionLayerID = useRef<string>();
+  const currentLayerID = useRef<string>();
 
-  const pointLayerID = useRef<string>()
-  const lineLayerID = useRef<string>()
-  const regionLayerID = useRef<string>()
-  const currentLayerID = useRef<string>()
-
-  const [license, setLicense] = useState<ILicenseInfo | undefined>()
+  const [license, setLicense] = useState<ILicenseInfo | undefined>();
 
   const [drawType, setDrawType] = useState<DrawType>(DrawType.Null);
 
   /** 准星图标句柄 用于获取屏幕坐标 */
-  const aimPointImageRef = useRef<Image>(null)
+  const aimPointImageRef = useRef<Image>(null);
 
-  const [clientUrl, setClientUrl] = useState<string | undefined>()
-
+  const [clientUrl, setClientUrl] = useState<string | undefined>();
 
   /** 激活许可 */
   const initLicense = () => {
     LicenseUtil.active().then(res => {
-      setLicense(res)
-    })
-  }
+      setLicense(res);
+    });
+  };
 
   useEffect(() => {
     // 激活 sdk 许可
-    initLicense()
-  }, [])
+    initLicense();
+  }, []);
 
   useEffect(() => {
     // 激活sdk后，初始化
     if (license) {
       // 获取 sdk web 服务地址
-      const res = RTNWebMap.getClientUrl()
+      const res = RTNWebMap.getClientUrl();
       if (res) {
-        setClientUrl(res)
+        setClientUrl(res);
       }
     }
     return () => {
       // 退出页面，关闭地图
-      WebMapUtil.getClient()?.mapControl.closeMap()
-      WebMapUtil.setClient(null)
-    }
-  }, [license])
+      WebMapUtil.getClient()?.mapControl.closeMap();
+      WebMapUtil.setClient(null);
+    };
+  }, [license]);
 
   /**
    * 设置绘制事件
-   * @param type 
-   * @returns 
+   * @param type
+   * @returns
    */
   const setAction = async (type: DrawType) => {
-    setDrawType(type)
+    setDrawType(type);
 
-    const client = WebMapUtil.getClient()
+    const client = WebMapUtil.getClient();
     if (!client) return;
     switch (type) {
       case DrawType.Null:
-        await client.mapControl.setAction(client.Action.select)
-        currentLayerID.current = undefined
-        break
+        await client.mapControl.setAction(client.Action.select);
+        currentLayerID.current = undefined;
+        break;
       case DrawType.Point:
-        if (!pointLayerID.current) return
-        currentLayerID.current = pointLayerID.current
-        await client.layers.setEditable(currentLayerID.current, true)
-        await client.mapControl.setAction(client.Action.draw_point)
-        break
+        if (!pointLayerID.current) return;
+        currentLayerID.current = pointLayerID.current;
+        await client.layers.setEditable(currentLayerID.current, true);
+        await client.mapControl.setAction(client.Action.draw_point);
+        break;
       case DrawType.Line:
-        if (!lineLayerID.current) return
-        currentLayerID.current = lineLayerID.current
-        await client.layers.setEditable(currentLayerID.current, true)
-        await client.mapControl.setAction(client.Action.draw_line)
-        break
+        if (!lineLayerID.current) return;
+        currentLayerID.current = lineLayerID.current;
+        await client.layers.setEditable(currentLayerID.current, true);
+        await client.mapControl.setAction(client.Action.draw_line);
+        break;
       case DrawType.Region:
-        if (!regionLayerID.current) return
-        currentLayerID.current = regionLayerID.current
-        await client.layers.setEditable(currentLayerID.current, true)
-        await client.mapControl.setAction(client.Action.draw_polygon)
-        break
+        if (!regionLayerID.current) return;
+        currentLayerID.current = regionLayerID.current;
+        await client.layers.setEditable(currentLayerID.current, true);
+        await client.mapControl.setAction(client.Action.draw_polygon);
+        break;
     }
-  }
+  };
 
   /**
    * 初始化方法
@@ -112,13 +117,13 @@ export default function DrawObject(props: Props) {
    * 当sdk初始化完成，我们通过这里的初始化方法开始进行地图图层初始化工作
    */
   const init = async () => {
-    const client = WebMapUtil.getClient()
+    const client = WebMapUtil.getClient();
     if (!client) return;
 
-    flyToInitPosition()
+    flyToInitPosition();
 
     await addDefaultLayer();
-  }
+  };
 
   /**
    * 地图定位到当前位置
@@ -136,13 +141,13 @@ export default function DrawObject(props: Props) {
       duration: 1000,
       scale: 4.4911532365316153e-8,
     });
-  }
+  };
 
   /** 添加点图层 */
   const addDefaultPointLayer = async () => {
-    const client = WebMapUtil.getClient()
+    const client = WebMapUtil.getClient();
 
-    if (!client) return
+    if (!client) return;
     // 添加数据源
     const result = await client.datasources.add({
       type: 'geojson',
@@ -157,9 +162,9 @@ export default function DrawObject(props: Props) {
           /** 别名 */
           caption: '名称',
         },
-      ]
-    })
-    let layer = undefined
+      ],
+    });
+    let layer = undefined;
     // 添加图层
     if (result) {
       const style: Partial<IPointStyle> = {
@@ -171,23 +176,23 @@ export default function DrawObject(props: Props) {
         circleOutlineWidth: 2,
         /** 纯色点轮廓颜色,默认白色 */
         circleOutlineColor: '#FFFFFF',
-      }
+      };
       const params: AddLayerParam = {
         type: 'vector',
         sourceId: result, // Add sourceId as required by AddLayerParam
         name: 'Point',
         geometryType: 'point',
         style: style,
-      }
-      layer = await client.layers.add(params)
+      };
+      layer = await client.layers.add(params);
     }
-    return layer
-  }
+    return layer;
+  };
 
   /** 添加线图层 */
   const addDefaultLineLayer = async () => {
-    const client = WebMapUtil.getClient()
-    if (!client) return
+    const client = WebMapUtil.getClient();
+    if (!client) return;
     // 添加数据源
     const result = await client.datasources.add({
       type: 'geojson',
@@ -202,9 +207,9 @@ export default function DrawObject(props: Props) {
           /** 别名 */
           caption: '名称',
         },
-      ]
-    })
-    let layer = undefined
+      ],
+    });
+    let layer = undefined;
     // 添加图层
     if (result) {
       const style: Partial<ILineStyle> = {
@@ -212,23 +217,23 @@ export default function DrawObject(props: Props) {
         lineColor: '#0064ff',
         /** 线宽。默认 1px */
         lineWidth: 3,
-      }
+      };
       const params: AddLayerParam = {
         type: 'vector',
         sourceId: result, // Add sourceId as required by AddLayerParam
         name: 'Line',
         geometryType: 'line',
         style: style,
-      }
-      layer = await client.layers.add(params)
+      };
+      layer = await client.layers.add(params);
     }
-    return layer
-  }
+    return layer;
+  };
 
   /** 添加面图层 */
   const addDefaultRegionLayer = async () => {
-    const client = WebMapUtil.getClient()
-    if (!client) return
+    const client = WebMapUtil.getClient();
+    if (!client) return;
     // 添加数据源
     const result = await client.datasources.add({
       type: 'geojson',
@@ -243,9 +248,9 @@ export default function DrawObject(props: Props) {
           /** 别名 */
           caption: '名称',
         },
-      ]
-    })
-    let layer = undefined
+      ],
+    });
+    let layer = undefined;
     // 添加图层
     if (result) {
       const style: Partial<IFillStyle> = {
@@ -255,69 +260,81 @@ export default function DrawObject(props: Props) {
         fillOutlineColor: '#0064FF',
         /** 轮廓宽度。默认 1px */
         fillOutlineWidth: 2,
-      }
+      };
       const params: AddLayerParam = {
         type: 'vector',
         sourceId: result, // Add sourceId as required by AddLayerParam
         name: 'Region',
         geometryType: 'fill',
         style: style,
-      }
-      layer = await client.layers.add(params)
+      };
+      layer = await client.layers.add(params);
     }
-    return layer
-  }
+    return layer;
+  };
 
   /**
    * 添加默认图层
    */
   const addDefaultLayer = async () => {
-    const client = WebMapUtil.getClient()
+    const client = WebMapUtil.getClient();
     if (!client) return;
 
-    const dss = await BaseLayerData.image[0].action()
+    const dss = await BaseLayerData.image[0].action();
     for (const ds of dss) {
-      ds && await client.baseLayers.add({
-        sourceId: ds.id,
-        name: ds.name,
-        type: 'image'
-      })
+      ds &&
+        (await client.baseLayers.add({
+          sourceId: ds.id,
+          name: ds.name,
+          type: 'image',
+        }));
     }
 
     // 添加默认图层
-    pointLayerID.current = await addDefaultPointLayer()
-    lineLayerID.current = await addDefaultLineLayer()
-    regionLayerID.current = await addDefaultRegionLayer()
-  }
+    pointLayerID.current = await addDefaultPointLayer();
+    lineLayerID.current = await addDefaultLineLayer();
+    regionLayerID.current = await addDefaultRegionLayer();
+  };
 
   /**
    * 获取屏幕坐标/地图坐标
    * @param transToMapLocation 是否转成地图坐标
-   * @returns 
+   * @returns
    */
-  const getDrawPosition = async (transToMapLocation = true): Promise<any | null> => {
+  const getDrawPosition = async (
+    transToMapLocation = true,
+  ): Promise<any | null> => {
     return new Promise(resolve => {
-      const client = WebMapUtil.getClient()
-      if (!client) return resolve(null)
-      aimPointImageRef.current?.measure(async (x: number, y: number, width: number, height: number, pageX: number, pageY: number) => {
-        const pointX = x + width / 2
-        const pointY = y + height / 2
-        if (transToMapLocation) {
-          // 屏幕坐标转为地理坐标
-          const tempPoint = await client.mapControl.pxToMap({
-            x: pointX,
-            y: pointY,
-          })
-          resolve(tempPoint)
-        } else {
-          resolve({
-            x: pointX,
-            y: pointY,
-          })
-        }
-      })
-    })
-  }
+      const client = WebMapUtil.getClient();
+      if (!client) return resolve(null);
+      aimPointImageRef.current?.measure(
+        async (
+          x: number,
+          y: number,
+          width: number,
+          height: number,
+          pageX: number,
+          pageY: number,
+        ) => {
+          const pointX = x + width / 2;
+          const pointY = y + height / 2;
+          if (transToMapLocation) {
+            // 屏幕坐标转为地理坐标
+            const tempPoint = await client.mapControl.pxToMap({
+              x: pointX,
+              y: pointY,
+            });
+            resolve(tempPoint);
+          } else {
+            resolve({
+              x: pointX,
+              y: pointY,
+            });
+          }
+        },
+      );
+    });
+  };
 
   /**
    * 向 `point` 图层添加一个点
@@ -359,29 +376,29 @@ export default function DrawObject(props: Props) {
 
   /** 提交绘制 */
   const _submit = async () => {
-    const client = WebMapUtil.getClient()
-    if (!client || drawType === DrawType.Null) return
-    client.mapControl.submit()
-  }
+    const client = WebMapUtil.getClient();
+    if (!client || drawType === DrawType.Null) return;
+    client.mapControl.submit();
+  };
 
   /** 取消绘制 */
   const _cancel = async () => {
-    const client = WebMapUtil.getClient()
-    if (!client || drawType === DrawType.Null) return
-    client.mapControl.trash()
-  }
+    const client = WebMapUtil.getClient();
+    if (!client || drawType === DrawType.Null) return;
+    client.mapControl.deleteCurrentGeometry();
+  };
 
   /** 开始绘制 */
   const _draw = async () => {
-    const client = WebMapUtil.getClient()
-    if (!client || drawType === DrawType.Null) return
-    const llPoint = await getDrawPosition(false)
-    client.mapControl.addTouchPoint(llPoint)
-  }
+    const client = WebMapUtil.getClient();
+    if (!client || drawType === DrawType.Null) return;
+    const llPoint = await getDrawPosition(false);
+    client.mapControl.addTouchPoint(llPoint);
+  };
 
   /** 左侧工具栏 */
   const _renderDrawMethods = () => {
-    if (!clientUrl) return null
+    if (!clientUrl) return null;
     return (
       <View
         style={{
@@ -393,36 +410,65 @@ export default function DrawObject(props: Props) {
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'space-between',
-        }}
-      >
+        }}>
         <View
           style={{
             width: '30%',
             marginLeft: 10,
           }}>
           <ImageButton
-            style={[styles.methodBtn, { backgroundColor: drawType === DrawType.Point ? '#4680DF' : '#fff' }]}
+            style={[
+              styles.methodBtn,
+              {
+                backgroundColor:
+                  drawType === DrawType.Point ? '#4680DF' : '#fff',
+              },
+            ]}
             image={getAssets().icon_point_black}
-            onPress={() => setAction(drawType === DrawType.Point ? DrawType.Null : DrawType.Point)}
+            onPress={() =>
+              setAction(
+                drawType === DrawType.Point ? DrawType.Null : DrawType.Point,
+              )
+            }
           />
           <ImageButton
-            style={[styles.methodBtn, { backgroundColor: drawType === DrawType.Line ? '#4680DF' : '#fff' }]}
+            style={[
+              styles.methodBtn,
+              {
+                backgroundColor:
+                  drawType === DrawType.Line ? '#4680DF' : '#fff',
+              },
+            ]}
             image={getAssets().icon_line_black}
-            onPress={() => setAction(drawType === DrawType.Line ? DrawType.Null : DrawType.Line)}
+            onPress={() =>
+              setAction(
+                drawType === DrawType.Line ? DrawType.Null : DrawType.Line,
+              )
+            }
           />
           <ImageButton
-            style={[styles.methodBtn, { backgroundColor: drawType === DrawType.Region ? '#4680DF' : '#fff' }]}
+            style={[
+              styles.methodBtn,
+              {
+                backgroundColor:
+                  drawType === DrawType.Region ? '#4680DF' : '#fff',
+              },
+            ]}
             image={getAssets().icon_region_black}
-            onPress={() => setAction(drawType === DrawType.Region ? DrawType.Null : DrawType.Region)}
+            onPress={() =>
+              setAction(
+                drawType === DrawType.Region ? DrawType.Null : DrawType.Region,
+              )
+            }
           />
         </View>
       </View>
-    )
-  }
+    );
+  };
 
   /** 画图中心点 */
   const _renderAim = () => {
-    if (!drawType) return null
+    if (!drawType) return null;
     return (
       <View
         style={{
@@ -435,8 +481,7 @@ export default function DrawObject(props: Props) {
           alignItems: 'center',
           backgroundColor: 'transparent',
         }}
-        pointerEvents={'none'}
-      >
+        pointerEvents={'none'}>
         <Image
           ref={aimPointImageRef}
           source={getAssets().icon_aim_point}
@@ -446,12 +491,12 @@ export default function DrawObject(props: Props) {
           }}
         />
       </View>
-    )
-  }
+    );
+  };
 
   /** 绘制工具 */
   const _renderBar = () => {
-    if (!drawType) return null
+    if (!drawType) return null;
     return (
       <View style={styles.textBar}>
         <TouchableOpacity onPress={_cancel} style={styles.bottomBtn}>
@@ -464,40 +509,37 @@ export default function DrawObject(props: Props) {
           <Text style={styles.bottomBtnText}>提交</Text>
         </TouchableOpacity>
       </View>
-    )
-  }
+    );
+  };
 
   const _renderTips = () => {
-    if (!drawType) return null
+    if (!drawType) return null;
     return (
       <View style={styles.tipsView}>
         <View style={styles.tips}>
           <Text style={styles.tipsTxt}>点击屏幕/点击加号绘制对象</Text>
         </View>
       </View>
-    )
-  }
+    );
+  };
 
-  if (!clientUrl) return null
+  if (!clientUrl) return null;
 
   return (
     <WebmapView
       clientUrl={clientUrl}
       onInited={client => {
         WebMapUtil.setClient(client);
-        init()
+        init();
       }}
-      navigation={props.navigation}
-    >
+      navigation={props.navigation}>
       {_renderDrawMethods()}
       {_renderAim()}
       {_renderBar()}
       {_renderTips()}
     </WebmapView>
-
   );
 }
-
 
 const styles = StyleSheet.create({
   textBar: {
@@ -521,7 +563,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     height: 40,
     width: 40,
-    backgroundColor: '#3499E5'
+    backgroundColor: '#3499E5',
   },
   bottomBtnText: {
     color: '#fff',
@@ -534,7 +576,7 @@ const styles = StyleSheet.create({
     width: 40,
     borderRadius: 4,
     backgroundColor: '#fff',
-    marginTop: 20
+    marginTop: 20,
   },
   methodBtnImg: {
     height: 30,
@@ -559,5 +601,5 @@ const styles = StyleSheet.create({
   tipsTxt: {
     color: '#fff',
     fontSize: 14,
-  }
+  },
 });

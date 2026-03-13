@@ -260,18 +260,12 @@ export default function Analyst(props: Props) {
       case DrawType.MultiSelect:
         // 多选
         await client.mapControl.setSelectOption({
-          /** 是否支持框选手势，默认false  */
           boxSelectEnable: false,
-          /** 累加选择，默认false  ps.按shift时强制进入累加选择模式*/
           accumulative: true,
-          /** 累加选择时是否通过框选取消选择状态，默认false  */
           boxUnselectWhenAccumulative: false,
-          /** 点击空白处取消选择，默认false  ps.单击鼠标右键强制取消选择 */
           cancleWhenClickNone: false,
-          /** 允许拖动选中的可编辑对象，默认false */
-          featureDragEnable: false,
-          /** 允许删除选中的可编辑对象，默认false */
-          featureTrashEnable: false,
+          editGeometryDraggable: false,
+          editGeometryDeletable: false,
         });
         await client.mapControl.setAction(client.Action.select);
         currentLayerID.current = undefined;
@@ -279,18 +273,12 @@ export default function Analyst(props: Props) {
       case DrawType.Select:
         // 但选
         await client.mapControl.setSelectOption({
-          /** 是否支持框选手势，默认false  */
           boxSelectEnable: false,
-          /** 累加选择，默认false  ps.按shift时强制进入累加选择模式*/
           accumulative: false,
-          /** 累加选择时是否通过框选取消选择状态，默认false  */
           boxUnselectWhenAccumulative: false,
-          /** 点击空白处取消选择，默认false  ps.单击鼠标右键强制取消选择 */
           cancleWhenClickNone: false,
-          /** 允许拖动选中的可编辑对象，默认false */
-          featureDragEnable: false,
-          /** 允许删除选中的可编辑对象，默认false */
-          featureTrashEnable: false,
+          editGeometryDraggable: false,
+          editGeometryDeletable: false,
         });
         await client.mapControl.setAction(client.Action.select);
         currentLayerID.current = undefined;
@@ -447,7 +435,7 @@ export default function Analyst(props: Props) {
   const _cancel = async () => {
     const client = WebMapUtil.getClient();
     if (!client || drawType === DrawType.Select) return;
-    client.mapControl.trash();
+    client.mapControl.deleteCurrentGeometry();
   };
 
   /** 开始绘制 */

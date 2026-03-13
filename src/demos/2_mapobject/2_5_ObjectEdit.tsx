@@ -299,18 +299,12 @@ export default function ObjectEdit(props: Props) {
 
     // 设置选择集操作参数
     client.mapControl.setSelectOption({
-      /** 是否支持框选手势，默认false  */
       boxSelectEnable: false,
-      /** 累加选择，默认false  ps.按shift时强制进入累加选择模式*/
       accumulative: false,
-      /** 累加选择时是否通过框选取消选择状态，默认false  */
       boxUnselectWhenAccumulative: false,
-      /** 点击空白处取消选择，默认false  ps.单击鼠标右键强制取消选择 */
       cancleWhenClickNone: true,
-      /** 允许拖动选中的可编辑对象，默认false */
-      featureDragEnable: false,
-      /** 允许删除选中的可编辑对象，默认false */
-      featureTrashEnable: true,
+      editGeometryDraggable: false,
+      editGeometryDeletable: true,
     });
     setIsMove(false);
     client.mapControl.setAction(client.Action.edit_vertex);
@@ -322,18 +316,12 @@ export default function ObjectEdit(props: Props) {
 
     // 设置选择集操作参数
     client.mapControl.setSelectOption({
-      /** 是否支持框选手势，默认false  */
       boxSelectEnable: false,
-      /** 累加选择，默认false  ps.按shift时强制进入累加选择模式*/
       accumulative: false,
-      /** 累加选择时是否通过框选取消选择状态，默认false  */
       boxUnselectWhenAccumulative: false,
-      /** 点击空白处取消选择，默认false  ps.单击鼠标右键强制取消选择 */
       cancleWhenClickNone: true,
-      /** 允许拖动选中的可编辑对象，默认false */
-      featureDragEnable: true,
-      /** 允许删除选中的可编辑对象，默认false */
-      featureTrashEnable: true,
+      editGeometryDraggable: true,
+      editGeometryDeletable: true,
     });
     setIsMove(true);
     client.mapControl.setAction(client.Action.select);
@@ -388,18 +376,12 @@ export default function ObjectEdit(props: Props) {
     client.mapControl.setAction(client.Action.select);
     // 取消后，设置为不可拖动 和 不可删除
     client.mapControl.setSelectOption({
-      /** 是否支持框选手势，默认false  */
       boxSelectEnable: false,
-      /** 累加选择，默认false  ps.按shift时强制进入累加选择模式*/
       accumulative: false,
-      /** 累加选择时是否通过框选取消选择状态，默认false  */
       boxUnselectWhenAccumulative: false,
-      /** 点击空白处取消选择，默认false  ps.单击鼠标右键强制取消选择 */
       cancleWhenClickNone: true,
-      /** 允许拖动选中的可编辑对象，默认false */
-      featureDragEnable: false,
-      /** 允许删除选中的可编辑对象，默认false */
-      featureTrashEnable: false,
+      editGeometryDraggable: false,
+      editGeometryDeletable: false,
     });
     setIsMove(false);
   };
@@ -528,7 +510,7 @@ export default function ObjectEdit(props: Props) {
     const client = WebMapUtil.getClient();
     if (!client || !selectData) return;
     // 删除节点
-    client.mapControl.trash();
+    client.mapControl.deleteEditVertext();
   };
 
   /** 编辑后提交 */
