@@ -112,15 +112,6 @@ export default function ObjectAttribute(props: Props) {
     addSelectListener();
     // 设置为选择模式
     client.mapControl.setAction(client.Action.select);
-    // 取消后，设置为不可拖动 和 不可删除
-    client.mapControl.setSelectOption({
-      boxSelectEnable: false,
-      accumulative: false,
-      boxUnselectWhenAccumulative: false,
-      cancleWhenClickNone: true,
-      editGeometryDraggable: false,
-      editGeometryDeletable: false,
-    });
   };
 
   /**

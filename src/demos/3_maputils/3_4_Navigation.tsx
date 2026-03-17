@@ -212,10 +212,10 @@ export default function Navigation(props: Props) {
       // console.log(param.navInfo)
     });
 
-    NativeHTools?.initTTS();
+    NativeHTools.initTTS();
     client.addListener('onNavgationAudioMessageChange', param => {
       console.log(param.message);
-      NativeHTools?.speak(param.message);
+      NativeHTools.speak(param.message);
     });
     // await client.navigation.setNavigationInfoUpdateCallback((navState, info)=>{
     //   console.log(navState)
@@ -260,7 +260,7 @@ export default function Navigation(props: Props) {
     console.log('导航停止');
     const client = WebMapUtil.getClient();
     if (!client) return;
-    NativeHTools?.stopSpeak();
+    NativeHTools.stopSpeak();
     await client.navigation.stop();
   };
 

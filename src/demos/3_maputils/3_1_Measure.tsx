@@ -111,14 +111,6 @@ export default function Measure(props: Props) {
     if (!client) return;
     // 监听对象被选中事件
     client.addListener('onMeasureResult', onMeasure);
-    client.mapControl.setSelectOption({
-      boxSelectEnable: false,
-      accumulative: false,
-      boxUnselectWhenAccumulative: false,
-      cancleWhenClickNone: true,
-      editGeometryDraggable: false,
-      editGeometryDeletable: false,
-    });
   };
 
   /** 移除选择监听 */

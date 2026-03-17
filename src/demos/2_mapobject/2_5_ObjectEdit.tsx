@@ -297,15 +297,6 @@ export default function ObjectEdit(props: Props) {
     const client = WebMapUtil.getClient();
     if (!client || !selectData) return;
 
-    // 设置选择集操作参数
-    client.mapControl.setSelectOption({
-      boxSelectEnable: false,
-      accumulative: false,
-      boxUnselectWhenAccumulative: false,
-      cancleWhenClickNone: true,
-      editGeometryDraggable: false,
-      editGeometryDeletable: true,
-    });
     setIsMove(false);
     client.mapControl.setAction(client.Action.edit_vertex);
   };
@@ -314,15 +305,6 @@ export default function ObjectEdit(props: Props) {
     const client = WebMapUtil.getClient();
     if (!client || !selectData) return;
 
-    // 设置选择集操作参数
-    client.mapControl.setSelectOption({
-      boxSelectEnable: false,
-      accumulative: false,
-      boxUnselectWhenAccumulative: false,
-      cancleWhenClickNone: true,
-      editGeometryDraggable: true,
-      editGeometryDeletable: true,
-    });
     setIsMove(true);
     client.mapControl.setAction(client.Action.select);
   };
@@ -340,11 +322,6 @@ export default function ObjectEdit(props: Props) {
     if (data.geometries.length > 0) {
       // 编辑对象之前，要设置对象所在图层可编辑
       await client.layers.setEditable(data.geometries[0].layerId, true);
-      // 把要编辑的对象设置为编辑状态
-      await client.mapControl.appointEditGeometry(
-        data.geometries[0].layerId,
-        data.geometries[0].geometryId,
-      );
       setSelectData({
         layerId: data.geometries[0].layerId,
         geometryId: data.geometries[0].geometryId,
@@ -374,15 +351,6 @@ export default function ObjectEdit(props: Props) {
     const client = WebMapUtil.getClient();
     if (!client) return;
     client.mapControl.setAction(client.Action.select);
-    // 取消后，设置为不可拖动 和 不可删除
-    client.mapControl.setSelectOption({
-      boxSelectEnable: false,
-      accumulative: false,
-      boxUnselectWhenAccumulative: false,
-      cancleWhenClickNone: true,
-      editGeometryDraggable: false,
-      editGeometryDeletable: false,
-    });
     setIsMove(false);
   };
 

@@ -259,27 +259,11 @@ export default function Analyst(props: Props) {
     switch (type) {
       case DrawType.MultiSelect:
         // 多选
-        await client.mapControl.setSelectOption({
-          boxSelectEnable: false,
-          accumulative: true,
-          boxUnselectWhenAccumulative: false,
-          cancleWhenClickNone: false,
-          editGeometryDraggable: false,
-          editGeometryDeletable: false,
-        });
-        await client.mapControl.setAction(client.Action.select);
+        await client.mapControl.setAction(client.Action.multi_select);
         currentLayerID.current = undefined;
         break;
       case DrawType.Select:
-        // 但选
-        await client.mapControl.setSelectOption({
-          boxSelectEnable: false,
-          accumulative: false,
-          boxUnselectWhenAccumulative: false,
-          cancleWhenClickNone: false,
-          editGeometryDraggable: false,
-          editGeometryDeletable: false,
-        });
+        // 单选
         await client.mapControl.setAction(client.Action.select);
         currentLayerID.current = undefined;
         break;
