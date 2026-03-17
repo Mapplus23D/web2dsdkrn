@@ -111,7 +111,7 @@ const addGaode = async () => {
     ],
     tileSize: 256,
   };
-  await webMap.mapControl.setCRS('WebMercator');
+  await webMap.mapControl.setCRS('WebMercator', 'GCJ02');
   const result = await webMap.datasources.add({
     type: 'raster',
     name: '高德地图',
@@ -130,7 +130,7 @@ const addGaodeImage = async () => {
     'https://service.mapplus.com/iserver/services/map-gaode-3857-img/rest/maps/gaode-3857-img',
   );
 
-  await webMap.mapControl.setCRS('WebMercator');
+  await webMap.mapControl.setCRS('WebMercator', 'GCJ02');
   const result = await webMap.datasources.add({
     type: 'raster',
     name: '高德影像地图',
@@ -149,7 +149,7 @@ const addTX = async () => {
     'https://service.mapplus.com/iserver/services/map-tengxun-3857-vec/rest/maps/tengxun-3857-vec',
   );
 
-  await webMap.mapControl.setCRS('WebMercator');
+  await webMap.mapControl.setCRS('WebMercator', 'GCJ02');
   const result = await webMap.datasources.add({
     type: 'raster',
     name: '腾讯地图',
@@ -168,7 +168,7 @@ const addTXImage = async () => {
     'https://service.mapplus.com/iserver/services/map-tengxun-3857-img/rest/maps/tengxun-3857-img',
   );
 
-  await webMap.mapControl.setCRS('WebMercator');
+  await webMap.mapControl.setCRS('WebMercator', 'GCJ02');
   const result = await webMap.datasources.add({
     type: 'raster',
     name: '腾讯影像',
@@ -187,7 +187,7 @@ const addTXDark = async () => {
     'https://service.mapplus.com/iserver/services/map-tengxun-3857-vec-dark/rest/maps/tengxun-3857-vec-dark',
   );
 
-  await webMap.mapControl.setCRS('WebMercator');
+  await webMap.mapControl.setCRS('WebMercator', 'GCJ02');
   const result = await webMap.datasources.add({
     type: 'raster',
     name: '暗色地图',
@@ -206,7 +206,7 @@ const addTXLight = async () => {
     'https://service.mapplus.com/iserver/services/map-tengxun-3857-vec-warm-prominent/rest/maps/tengxun-3857-vec-warm-prominent',
   );
 
-  await webMap.mapControl.setCRS('WebMercator');
+  await webMap.mapControl.setCRS('WebMercator', 'GCJ02');
   const result = await webMap.datasources.add({
     type: 'raster',
     name: '亮色地图',
@@ -225,7 +225,7 @@ const addTXTerrain = async () => {
     'https://service.mapplus.com/iserver/services/map-tengxun-3857-dem/rest/maps/tengxun-3857-dem',
   );
 
-  await webMap.mapControl.setCRS('WebMercator');
+  await webMap.mapControl.setCRS('WebMercator', 'GCJ02');
   const result = await webMap.datasources.add({
     type: 'raster',
     name: '腾讯地形',

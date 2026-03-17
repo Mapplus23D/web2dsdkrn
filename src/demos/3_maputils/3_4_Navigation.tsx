@@ -80,6 +80,7 @@ export default function Navigation(props: Props) {
     if (!client) return;
 
     // 添加默认底图
+    await client.mapControl.setDynamicProjection(true);
     const dss = await BaseLayerData.image[3].action();
     for (const ds of dss) {
       ds &&
