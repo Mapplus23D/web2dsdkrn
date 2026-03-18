@@ -9,7 +9,14 @@ import {
   RTNWebMap,
 } from '@mapplus/react-native-webmap';
 import { useEffect, useRef, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { getAssets } from '../../assets';
 import { WebmapView } from '../../components';
 import BaseLayerData from '../../constants/BaseLayerData';
@@ -119,8 +126,12 @@ export default function MapCallout(props: Props) {
           pageX: number,
           pageY: number,
         ) => {
-          const pointX = x + width / 2;
-          const pointY = y + height / 2;
+          let pointX = x + width / 2;
+          let pointY = y + height / 2;
+          if (Platform.OS === 'android') {
+            pointX = pageX + width / 2;
+            pointY = pageY + height / 2;
+          }
           if (transToMapLocation) {
             // 屏幕坐标转为地理坐标
             const tempPoint = await client.mapControl.pxToMap({
