@@ -21,6 +21,7 @@ export default class EntryAbility extends RNAbility {
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
+    super.onWindowStageCreate(windowStage);
     // Main window is created, set main page for this ability
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
@@ -39,11 +40,13 @@ export default class EntryAbility extends RNAbility {
   }
 
   onForeground(): void {
+    super.onForeground()
     // Ability has brought to foreground
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onForeground');
   }
 
   onBackground(): void {
+    super.onBackground()
     // Ability has back to background
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
   }
